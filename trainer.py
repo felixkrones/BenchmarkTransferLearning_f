@@ -1,5 +1,5 @@
 from utils import MetricLogger, ProgressLogger
-from models import ClassificationNet
+from models import ClassificationNet, build_classification_model
 import time
 import torch
 from tqdm import tqdm
@@ -66,7 +66,6 @@ def evaluate(data_loader_val, device, model, criterion):
 
 def test_classification(checkpoint, data_loader_test, device, args):
   model = ClassificationNet(args.model_name.lower(), args.num_class, activation=args.activate)
-  print(model)
 
   modelCheckpoint = torch.load(checkpoint)
   state_dict = modelCheckpoint['state_dict']
@@ -85,12 +84,12 @@ def test_classification(checkpoint, data_loader_test, device, args):
 
   model.eval()
 
-  y_test = torch.FloatTensor().cuda()
-  p_test = torch.FloatTensor().cuda()
+  y_test = torch.FloatTensor().to(device)
+  p_test = torch.FloatTensor().to(device)
 
   with torch.no_grad():
     for i, (samples, targets) in enumerate(tqdm(data_loader_test)):
-      targets = targets.cuda()
+      targets = targets.to(device)
       y_test = torch.cat((y_test, targets), 0)
 
       if len(samples.size()) == 4:
@@ -99,7 +98,7 @@ def test_classification(checkpoint, data_loader_test, device, args):
       elif len(samples.size()) == 5:
         bs, n_crops, c, h, w = samples.size()
 
-      varInput = torch.autograd.Variable(samples.view(-1, c, h, w).cuda())
+      varInput = torch.autograd.Variable(samples.view(-1, c, h, w).to(device))
 
       out = model(varInput)
       outMean = out.view(bs, n_crops, -1).mean(1)

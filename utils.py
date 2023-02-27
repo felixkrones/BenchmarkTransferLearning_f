@@ -1,4 +1,4 @@
-from sklearn.metrics.ranking import roc_auc_score
+from sklearn.metrics import roc_auc_score
 import torch
 import numpy as np
 
@@ -51,7 +51,10 @@ def metric_AUROC(target, output, nb_classes=14):
     output = output.cpu().numpy()
 
     for i in range(nb_classes):
-        outAUROC.append(roc_auc_score(target[:, i], output[:, i]))
+        if target[:, i].sum() != 0:
+            outAUROC.append(roc_auc_score(target[:, i], output[:, i]))
+        else:
+            outAUROC.append(0)
 
     return outAUROC
 

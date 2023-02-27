@@ -32,7 +32,7 @@ def get_args_parser():
                       type="string")
     parser.add_option("--img_size", dest="img_size", help="input image resolution", default=224, type="int")
     parser.add_option("--img_depth", dest="img_depth", help="num of image depth", default=3, type="int")
-    parser.add_option("--data_dir", dest="data_dir", help="dataset dir",default=None, type="string")
+    parser.add_option("--data_dir", dest="data_dir", help="dataset dir",default="data/", type="string")
     parser.add_option("--train_list", dest="train_list", help="file for training list",
                       default=None, type="string")
     parser.add_option("--val_list", dest="val_list", help="file for validating list",
@@ -41,7 +41,7 @@ def get_args_parser():
                       default=None, type="string")
     parser.add_option("--mode", dest="mode", help="train | test", default="train", type="string")
     parser.add_option("--batch_size", dest="batch_size", help="batch size", default=32, type="int")
-    parser.add_option("--num_epoch", dest="num_epoch", help="num of epoches", default=1000, type="int")
+    parser.add_option("--num_epoch", dest="num_epoch", help="num of epoches", default=20, type="int")
     parser.add_option("--optimizer", dest="optimizer", help="Adam | SGD", default="Adam", type="string")
     parser.add_option("--lr", dest="lr", help="learning rate", default=2e-4, type="float")
     parser.add_option("--lr_Scheduler", dest="lr_Scheduler", help="learning schedule", default="ReduceLROnPlateau",
@@ -53,7 +53,7 @@ def get_args_parser():
     parser.add_option("--start_index", dest="start_index", help="the start model index", default=0, type="int")
     parser.add_option("--clean", dest="clean", help="clean the existing data", default=False, action="callback",
                       callback=vararg_callback_bool)
-    parser.add_option("--resume", dest="resume", help="whether latest checkpoint", default=False, action="callback",
+    parser.add_option("--resume", dest="resume", help="whether latest checkpoint", default=True, action="callback",
                       callback=vararg_callback_bool)
     parser.add_option("--workers", dest="workers", help="number of CPU workers", default=8, type="int")
     parser.add_option("--print_freq", dest="print_freq", help="print frequency", default=50, type="int")
@@ -118,6 +118,7 @@ def main(args):
         dataset_test = CheXpertDataset(images_path=args.data_dir, file_path=args.test_list,
                                        augment=build_transform_classification(normalize=args.normalization, mode="test"), uncertain_label=args.uncertain_label, unknown_label=args.unknown_label, annotation_percent=args.anno_percent)
 
+        print(f"Got dataset {args.data_set}, starting classification_engine.")
         classification_engine(args, model_path, output_path, diseases, dataset_train, dataset_val, dataset_test, test_diseases)
 
     elif args.data_set == "Shenzhen":
