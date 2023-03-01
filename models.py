@@ -130,6 +130,7 @@ def ClassificationNet(arch_name, num_class, args, conv=None, weight=None, activa
 
 def build_classification_model(args):
     if "vit" in args.model_name.lower():
+        model = None
         if args.proxy_dir is None or args.proxy_dir =='':
             print('Loading pretrained {} weights for {} from timm.'.format(args.init, args.model_name))
             if args.model_name.lower() == "vit_base":
@@ -179,9 +180,8 @@ def build_classification_model(args):
                     model = VisionTransformer(num_classes=args.num_class,
                         patch_size=16, embed_dim=384, depth=12, num_heads=6, mlp_ratio=4, qkv_bias=True,
                         norm_layer=partial(nn.LayerNorm, eps=1e-6))
-                    model = get_prepared_checkpoint(model, args.proxy_dir)
-                    model = LabelTokenViT(args, model, label_layers=args.label_layers)
-                    raise NotImplementedError("")
+                    model = get_prepared_checkpoint(model, "models/gmml_1000e_nih.pth")
+                    #model = LabelTokenViT(args.num_class, model, label_layers=args.label_layers)
                 elif args.init.lower() =="deit":
                     model = timm.create_model('deit_small_patch16_224', num_classes=args.num_class, pretrained=True)           
 
@@ -212,11 +212,18 @@ def build_classification_model(args):
                     load_proxy_dir(model, args.init.lower(), args.proxy_dir)
                 
             elif args.model_name.lower() == "vit_small":
-                model = VisionTransformer(num_classes=args.num_class,
+                if args.init.lower() == "gmml":
+                    model = VisionTransformer(num_classes=args.num_class,
                         patch_size=16, embed_dim=384, depth=12, num_heads=6, mlp_ratio=4, qkv_bias=True,
                         norm_layer=partial(nn.LayerNorm, eps=1e-6))
-                model.default_cfg = _cfg()
-                load_proxy_dir(model, args.init.lower(), args.proxy_dir)  
+                    model = get_prepared_checkpoint(model, args.proxy_dir)
+                    #model = LabelTokenViT(args.num_class, model, label_layers=args.label_layers)
+                else:
+                    model = VisionTransformer(num_classes=args.num_class,
+                            patch_size=16, embed_dim=384, depth=12, num_heads=6, mlp_ratio=4, qkv_bias=True,
+                            norm_layer=partial(nn.LayerNorm, eps=1e-6))
+                    model.default_cfg = _cfg()
+                    load_proxy_dir(model, args.init.lower(), args.proxy_dir)  
                 
             elif args.model_name.lower() == "swin_base":
                 if args.init.lower() == "simmim":
@@ -228,7 +235,8 @@ def build_classification_model(args):
             elif args.model_name.lower() == "swin_tiny": 
                 model = timm.create_model('swin_tiny_patch4_window7_224', num_classes=args.num_class)
                 load_proxy_dir(model, args.init.lower(), args.proxy_dir)
-            
+        else:
+            raise FileNotFoundError(f"Proxy dir {args.proxy_dir} is not a file or directory!")
         if model is None:
             print("Not provide {} pretrained weights for {}.".format(args.init, args.model_name))
             raise Exception("Please provide correct parameters to load the model!")

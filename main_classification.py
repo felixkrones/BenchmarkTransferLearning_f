@@ -88,7 +88,7 @@ def main(args):
         assert args.proxy_dir is not None
 
     args.exp_name = args.model_name + "_" + args.init
-    model_path = os.path.join("./Models/Classification",args.data_set)
+    model_path = os.path.join("./models/Classification",args.data_set)
     output_path = os.path.join("./Outputs/Classification",args.data_set)
 
     if args.data_set == "ChestXray14":

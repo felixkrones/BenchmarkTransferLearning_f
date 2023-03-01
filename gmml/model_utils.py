@@ -29,6 +29,12 @@ def get_prepared_checkpoint(model, checkpoint_path):
             print(f"Removing key {k} from pretrained checkpoint")
             del checkpoint_model[k]
 
+    # Check if number of channels in pretrained model is same as the model. If not, convert the pretrained model
+    if checkpoint_model['patch_embed.proj.weight'].shape[1] < state_dict['patch_embed.proj.weight'].shape[1]:
+        print(f"Number of channels in pretrained model {checkpoint_model['patch_embed.proj.weight'].shape} is not same as the model {state_dict['patch_embed.proj.weight'].shape}. Converting the pretrained model")
+        checkpoint_model['patch_embed.proj.weight'] = checkpoint_model['patch_embed.proj.weight'].repeat(1, state_dict['patch_embed.proj.weight'].shape[1], 1, 1)
+        print(f"New shape of pretrained model {checkpoint_model['patch_embed.proj.weight'].shape}")
+        
     msg = model.load_state_dict(checkpoint_model, strict=False)
     # print(msg)
     
@@ -37,13 +43,14 @@ def get_prepared_checkpoint(model, checkpoint_path):
 
 class LabelTokenViT(nn.Module):
 
-    def __init__(self, args, model, label_layers=4, label_cross=False, num_tokens=None, norm_lt=True):
+    def __init__(self, num_classes, model, label_layers=4, label_cross=False, num_tokens=None, norm_lt=True):
         super(LabelTokenViT, self).__init__()
 
         self.vit = model
         self.embed_dim = model.embed_dim
-        self.nb_classes = args.nb_classes
+        self.nb_classes = num_classes
         self.depth = len(self.vit.blocks)
+        self.norm_lt = norm_lt
 
         if label_layers > 0:
             self.useLT = True
@@ -54,7 +61,6 @@ class LabelTokenViT(nn.Module):
             self.label_tokens = trunc_normal_(self.label_tokens, std=0.2)
             
             self.label_heads = nn.ModuleList([nn.Linear(self.embed_dim, 1) for i in range(self.nb_classes)])
-            self.norm_lt = True if args.norm_lt==1 else False
 
         else:
             self.useLT = False
