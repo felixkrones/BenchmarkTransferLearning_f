@@ -3,6 +3,7 @@
 ###############################################################################
 
 # exclude everything
+BenchmarkTransformers
 BenchmarkTransformers/*
 data/*
 models/*
