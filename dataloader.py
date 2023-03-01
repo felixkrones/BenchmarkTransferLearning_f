@@ -3,11 +3,15 @@ import torch
 import random
 import copy
 import csv
+import pandas as pd
+import pathlib
 from PIL import Image
-
+import torchvision.transforms as T
 from torch.utils.data import Dataset
 import torchvision.transforms as transforms
 from torch.utils.data.dataset import Dataset
+from skimage.io import imread
+from typing import Callable, Optional
 import numpy as np
 import pydicom as dicom
 import cv2
@@ -84,6 +88,61 @@ def build_transform_segmentation():
   return AUGMENTATIONS_TRAIN
 
 
+class ChestXray14Dataset_general(Dataset):
+
+  def __init__(self, images_path, file_path, augment, possible_labels, annotaion_percent=100, annotation_file="Data_Entry_2017_v2020.csv"):
+    
+    self.img_list = []
+    self.img_label = []
+    self.augment = augment
+    self._annotation_file = pd.read_csv(pathlib.Path(images_path) / annotation_file)
+    self.possible_labels = possible_labels
+
+    with open(file_path, "r") as fileDescriptor:
+      line = True
+
+      while line:
+        line = fileDescriptor.readline()
+
+        if line:
+          lineItems = line.split()
+
+          imagePath = os.path.join(images_path, lineItems[0])
+
+          labels = self._annotation_file[self._annotation_file["Image Index"]==lineItems[0]]["Finding Labels"].values[0]
+          imageLabel = [1 if label in labels else 0 for label in possible_labels]
+
+          self.img_list.append(imagePath)
+          self.img_label.append(imageLabel)
+
+    indexes = np.arange(len(self.img_list))
+    if annotaion_percent < 100:
+      random.Random(99).shuffle(indexes)
+      num_data = int(indexes.shape[0] * annotaion_percent / 100.0)
+      indexes = indexes[:num_data]
+
+      _img_list, _img_label = copy.deepcopy(self.img_list), copy.deepcopy(self.img_label)
+      self.img_list = []
+      self.img_label = []
+
+      for i in indexes:
+        self.img_list.append(_img_list[i])
+        self.img_label.append(_img_label[i])
+
+  def __getitem__(self, index):
+
+    imagePath = self.img_list[index]
+
+    imageData = Image.open(imagePath).convert('RGB')
+    imageLabel = torch.FloatTensor(self.img_label[index])
+
+    if self.augment != None: imageData = self.augment(imageData)
+
+    return imageData, imageLabel
+
+  def __len__(self):
+
+    return len(self.img_list)
 
 
 class ChestXray14Dataset(Dataset):

@@ -65,7 +65,10 @@ def evaluate(data_loader_val, device, model, criterion):
 
 
 def test_classification(checkpoint, data_loader_test, device, args):
-  model = ClassificationNet(args.model_name.lower(), args.num_class, activation=args.activate)
+  if "vit" in args.model_name.lower():
+    model = build_classification_model(args)
+  else:
+    model = ClassificationNet(args.model_name.lower(), args.num_class, args, activation=args.activate)
 
   modelCheckpoint = torch.load(checkpoint)
   state_dict = modelCheckpoint['state_dict']
@@ -100,9 +103,18 @@ def test_classification(checkpoint, data_loader_test, device, args):
 
       varInput = torch.autograd.Variable(samples.view(-1, c, h, w).to(device))
 
-      out = model(varInput)
-      outMean = out.view(bs, n_crops, -1).mean(1)
-      p_test = torch.cat((p_test, outMean.data), 0)
+      if "vit" in args.model_name.lower():
+        out = model(varInput)
+        if args.data_set == "RSNAPneumonia":
+          out = torch.softmax(out,dim = 1)
+        else:
+          out = torch.sigmoid(out)
+        outMean = out.view(bs, n_crops, -1).mean(1)
+        p_test = torch.cat((p_test, outMean.data), 0)
+      else:
+        out = model(varInput)
+        outMean = out.view(bs, n_crops, -1).mean(1)
+        p_test = torch.cat((p_test, outMean.data), 0)
 
   return y_test, p_test
 

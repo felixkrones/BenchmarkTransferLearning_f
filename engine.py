@@ -71,7 +71,7 @@ def classification_engine(args, model_path, output_path, diseases, dataset_train
 
 
       if args.resume:
-        resume = os.path.join(model_path, experiment + '.pth.tar')
+        resume = os.path.join(model_path, experiment + f'_{args.best}.pth.tar')
         if os.path.isfile(resume):
           print("=> loading checkpoint '{}'".format(resume))
           checkpoint = torch.load(resume)
@@ -98,11 +98,18 @@ def classification_engine(args, model_path, output_path, diseases, dataset_train
         if val_loss < best_val_loss:
           save_checkpoint({
             'epoch': epoch + 1,
-            'lossMIN': best_val_loss,
+            'lossMIN': val_loss,
             'state_dict': model.state_dict(),
             'optimizer': optimizer.state_dict(),
             'scheduler': lr_scheduler.state_dict(),
-          },  filename=save_model_path)
+          },  filename=save_model_path+"_best")
+          save_checkpoint({
+            'epoch': epoch + 1,
+            'lossMIN': val_loss,
+            'state_dict': model.state_dict(),
+            'optimizer': optimizer.state_dict(),
+            'scheduler': lr_scheduler.state_dict(),
+          },  filename=save_model_path+"_last")
 
           best_val_loss = val_loss
           patience_counter = 0
@@ -132,63 +139,74 @@ def classification_engine(args, model_path, output_path, diseases, dataset_train
                                 num_workers=args.workers, pin_memory=True)
 
   log_file = os.path.join(model_path, "models.log")
+  load_pretrained = False
   if not os.path.isfile(log_file):
-    print("log_file ({}) not exists!".format(log_file))
-  else:
-    mean_auc_test = []
-    mean_auc_all = []
-    with open(log_file, 'r') as reader, open(output_file, 'a') as writer:
-      experiment = reader.readline()
-      print(">> Disease = {}".format(diseases))
-      writer.write("Disease = {}\n".format(diseases))
+    if args.proxy_dir is None:
+      raise FileNotFoundError("log_file ({}) not exists!".format(log_file))
+    else:
+      saved_model = args.proxy_dir
+      load_pretrained = True
+      with open(log_file, 'a') as f:
+        experiment = args.proxy_dir.replace(".pth.tar", "")
+        f.write(experiment + "\n")
+        f.close()
+  mean_auc_test = []
+  mean_auc_all = []
+  with open(log_file, 'r') as reader, open(output_file, 'a') as writer:
+    experiment = reader.readline()
+    print(">> Disease = {}".format(diseases))
+    writer.write("Disease = {}\n".format(diseases))
 
-      while experiment:
-        experiment = experiment.replace('\n', '')
+    while experiment:
+      experiment = experiment.replace('\n', '')
+      if load_pretrained:
+        saved_model = os.path.join(args.proxy_dir)
+      else:
         saved_model = os.path.join(model_path, experiment + ".pth.tar")
 
-        y_test, p_test = test_classification(saved_model, data_loader_test, device, args)
-        all_results = metric_AUROC(y_test, p_test, args.num_class)
+      y_test, p_test = test_classification(saved_model, data_loader_test, device, args)
+      all_results = metric_AUROC(y_test, p_test, args.num_class)
 
-        if test_diseases is not None:
-          y_test = copy.deepcopy(y_test[:,test_diseases])
-          p_test = copy.deepcopy(p_test[:, test_diseases])
-          individual_results = metric_AUROC(y_test, p_test, len(test_diseases))
-        else:
-          individual_results = metric_AUROC(y_test, p_test, args.num_class)
-        print(">>{}: AUC test = {}".format(experiment, np.array2string(np.array(individual_results), precision=4, separator=',')))
-        writer.write(
-          "{}: AUC test = {}\n".format(experiment, np.array2string(np.array(individual_results), precision=4, separator='\t')))
-        print(">>{}: AUC all = {}".format(experiment, np.array2string(np.array(all_results), precision=4, separator=',')))
-        writer.write(
-          "{}: AUC all = {}\n".format(experiment, np.array2string(np.array(all_results), precision=4, separator='\t')))
+      if test_diseases is not None:
+        y_test = copy.deepcopy(y_test[:,test_diseases])
+        p_test = copy.deepcopy(p_test[:, test_diseases])
+        individual_results = metric_AUROC(y_test, p_test, len(test_diseases))
+      else:
+        individual_results = metric_AUROC(y_test, p_test, args.num_class)
+      print(">>{}: AUC test = {}".format(experiment, np.array2string(np.array(individual_results), precision=4, separator=',')))
+      writer.write(
+        "{}: AUC test = {}\n".format(experiment, np.array2string(np.array(individual_results), precision=4, separator='\t')))
+      print(">>{}: AUC all = {}".format(experiment, np.array2string(np.array(all_results), precision=4, separator=',')))
+      writer.write(
+        "{}: AUC all = {}\n".format(experiment, np.array2string(np.array(all_results), precision=4, separator='\t')))
 
 
-        mean_over_test_classes = np.array(individual_results).mean()
-        mean_over_all_classes = np.array(all_results).mean()
-        print(">>{}: AUC test = {:.4f}".format(experiment, mean_over_test_classes))
-        writer.write("{}: AUC test = {:.4f}\n".format(experiment, mean_over_test_classes))
-        print(">>{}: AUC all = {:.4f}".format(experiment, mean_over_all_classes))
-        writer.write("{}: AUC all = {:.4f}\n".format(experiment, mean_over_all_classes))
+      mean_over_test_classes = np.array(individual_results).mean()
+      mean_over_all_classes = np.array(all_results).mean()
+      print(">>{}: AUC test = {:.4f}".format(experiment, mean_over_test_classes))
+      writer.write("{}: AUC test = {:.4f}\n".format(experiment, mean_over_test_classes))
+      print(">>{}: AUC all = {:.4f}".format(experiment, mean_over_all_classes))
+      writer.write("{}: AUC all = {:.4f}\n".format(experiment, mean_over_all_classes))
 
-        mean_auc_test.append(mean_over_test_classes)
-        mean_auc_all.append(mean_over_all_classes)
-        experiment = reader.readline()
+      mean_auc_test.append(mean_over_test_classes)
+      mean_auc_all.append(mean_over_all_classes)
+      experiment = reader.readline()
 
-      mean_auc_test = np.array(mean_auc_test)
-      mean_auc_all = np.array(mean_auc_all)
-      print(">> All trials: test mAUC  = {}".format(np.array2string(mean_auc_test, precision=4, separator=',')))
-      writer.write("All trials: test mAUC  = {}\n".format(np.array2string(mean_auc_test, precision=4, separator='\t')))
-      print(">> Mean AUC over All test trials: = {:.4f}".format(np.mean(mean_auc_test)))
-      writer.write("Mean AUC over All test trials = {:.4f}\n".format(np.mean(mean_auc_test)))
-      print(">> STD over All test trials:  = {:.4f}".format(np.std(mean_auc_test)))
-      writer.write("STD over All test trials:  = {:.4f}\n".format(np.std(mean_auc_test)))
+    mean_auc_test = np.array(mean_auc_test)
+    mean_auc_all = np.array(mean_auc_all)
+    print(">> All trials: test mAUC  = {}".format(np.array2string(mean_auc_test, precision=4, separator=',')))
+    writer.write("All trials: test mAUC  = {}\n".format(np.array2string(mean_auc_test, precision=4, separator='\t')))
+    print(">> Mean AUC over All test trials: = {:.4f}".format(np.mean(mean_auc_test)))
+    writer.write("Mean AUC over All test trials = {:.4f}\n".format(np.mean(mean_auc_test)))
+    print(">> STD over All test trials:  = {:.4f}".format(np.std(mean_auc_test)))
+    writer.write("STD over All test trials:  = {:.4f}\n".format(np.std(mean_auc_test)))
 
-      print(">> All trials: all mAUC  = {}".format(np.array2string(mean_auc_all, precision=4, separator=',')))
-      writer.write("All trials: all mAUC  = {}\n".format(np.array2string(mean_auc_all, precision=4, separator='\t')))
-      print(">> Mean AUC over All all trials: = {:.4f}".format(np.mean(mean_auc_all)))
-      writer.write("Mean AUC over All all trials = {:.4f}\n".format(np.mean(mean_auc_all)))
-      print(">> STD over All all trials:  = {:.4f}".format(np.std(mean_auc_all)))
-      writer.write("STD over All all trials:  = {:.4f}\n".format(np.std(mean_auc_all)))
+    print(">> All trials: all mAUC  = {}".format(np.array2string(mean_auc_all, precision=4, separator=',')))
+    writer.write("All trials: all mAUC  = {}\n".format(np.array2string(mean_auc_all, precision=4, separator='\t')))
+    print(">> Mean AUC over All all trials: = {:.4f}".format(np.mean(mean_auc_all)))
+    writer.write("Mean AUC over All all trials = {:.4f}\n".format(np.mean(mean_auc_all)))
+    print(">> STD over All all trials:  = {:.4f}".format(np.std(mean_auc_all)))
+    writer.write("STD over All all trials:  = {:.4f}\n".format(np.std(mean_auc_all)))
 
 def segmentation_engine(args, model_path, dataset_train, dataset_val, dataset_test,criterion):
   device = torch.device(args.device)

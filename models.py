@@ -1,18 +1,20 @@
 import os
 import numpy as np
 from sklearn.metrics import confusion_matrix, roc_auc_score
-
+from functools import partial
 import timm
+from timm.models.vision_transformer import VisionTransformer, _cfg
 import torch
 import torch.nn as nn
 import torchvision.models as models
 
 import resnet_wider
 import densenet
+import simmim
+from gmml.model_utils import get_prepared_checkpoint, LabelTokenViT
 
 
-
-def ClassificationNet(arch_name, num_class, conv=None, weight=None, activation=None):
+def ClassificationNet(arch_name, num_class, args, conv=None, weight=None, activation=None):
     if weight is None:
         weight = "none"
 
@@ -127,7 +129,7 @@ def ClassificationNet(arch_name, num_class, conv=None, weight=None, activation=N
 
 def build_classification_model(args):
     if "vit" in args.model_name.lower():
-        if args.pretrained_weights is None or args.pretrained_weights =='':
+        if args.proxy_dir is None or args.proxy_dir =='':
             print('Loading pretrained {} weights for {} from timm.'.format(args.init, args.model_name))
             if args.model_name.lower() == "vit_base":
                 if args.init.lower() =="random":
@@ -136,7 +138,7 @@ def build_classification_model(args):
                             norm_layer=partial(nn.LayerNorm, eps=1e-6))
                     model.default_cfg = _cfg()
                     # model = timm.create_model('vit_base_patch16_224', num_classes=args.num_class, pretrained=False)
-                elif args.init.lower() =="imagenet_1k":
+                elif args.init.lower() =="imagenet_1k" or args.init.lower() =="imagenet":
                     model = timm.create_model('vit_base_patch16_224', num_classes=args.num_class, pretrained=True)
                 elif args.init.lower() =="imagenet_21k":
                     model = timm.create_model('vit_base_patch16_224_in21k', num_classes=args.num_class, pretrained=True)  
@@ -159,7 +161,7 @@ def build_classification_model(args):
             elif args.model_name.lower() == "vit_small":
                 if args.init.lower() =="random":
                     model = timm.create_model('vit_small_patch16_224', num_classes=args.num_class, pretrained=False)
-                elif args.init.lower() =="imagenet_1k":
+                elif args.init.lower() =="imagenet_1k" or args.init.lower() =="imagenet":
                     model = timm.create_model('vit_small_patch16_224', num_classes=args.num_class, pretrained=True)
                 elif args.init.lower() =="imagenet_21k":
                     model = timm.create_model('vit_small_patch16_224_in21k', num_classes=args.num_class, pretrained=True)
@@ -172,6 +174,13 @@ def build_classification_model(args):
                     url = "https://dl.fbaipublicfiles.com/dino/dino_deitsmall16_pretrain/dino_deitsmall16_pretrain.pth"
                     state_dict = torch.hub.load_state_dict_from_url(url=url)
                     model.load_state_dict(state_dict, strict=False)
+                elif args.init.lower() == "gmml":
+                    model = VisionTransformer(num_classes=args.num_class,
+                        patch_size=16, embed_dim=384, depth=12, num_heads=6, mlp_ratio=4, qkv_bias=True,
+                        norm_layer=partial(nn.LayerNorm, eps=1e-6))
+                    model = get_prepared_checkpoint(model, args.proxy_dir)
+                    model = LabelTokenViT(args, model, label_layers=args.label_layers)
+                    raise NotImplementedError("")
                 elif args.init.lower() =="deit":
                     model = timm.create_model('deit_small_patch16_224', num_classes=args.num_class, pretrained=True)           
 
@@ -186,11 +195,11 @@ def build_classification_model(args):
             elif args.model_name.lower() == "swin_tiny": 
                 if args.init.lower() =="random":
                     model = timm.create_model('swin_tiny_patch4_window7_224', num_classes=args.num_class, pretrained=False)
-                elif args.init.lower() =="imagenet_1k":
+                elif args.init.lower() =="imagenet_1k" or args.init.lower() =="imagenet":
                     model = timm.create_model('swin_tiny_patch4_window7_224', num_classes=args.num_class, pretrained=True)
             
-        elif os.path.isfile(args.pretrained_weights):
-            print("Creating model from pretrained weights: "+ args.pretrained_weights)
+        elif os.path.isfile(args.proxy_dir):
+            print("Creating model from pretrained weights: "+ args.proxy_dir)
             if args.model_name.lower() == "vit_base":
                 if args.init.lower() == "simmim":
                     model = simmim.create_model(args)
@@ -199,43 +208,43 @@ def build_classification_model(args):
                             patch_size=16, embed_dim=768, depth=12, num_heads=12, mlp_ratio=4, qkv_bias=True,
                             norm_layer=partial(nn.LayerNorm, eps=1e-6))
                     model.default_cfg = _cfg()
-                    load_pretrained_weights(model, args.init.lower(), args.pretrained_weights)
+                    load_proxy_dir(model, args.init.lower(), args.proxy_dir)
                 
             elif args.model_name.lower() == "vit_small":
                 model = VisionTransformer(num_classes=args.num_class,
                         patch_size=16, embed_dim=384, depth=12, num_heads=6, mlp_ratio=4, qkv_bias=True,
                         norm_layer=partial(nn.LayerNorm, eps=1e-6))
                 model.default_cfg = _cfg()
-                load_pretrained_weights(model, args.init.lower(), args.pretrained_weights)  
+                load_proxy_dir(model, args.init.lower(), args.proxy_dir)  
                 
             elif args.model_name.lower() == "swin_base":
                 if args.init.lower() == "simmim":
                     model = simmim.create_model(args)
-                elif args.init.lower() =="imagenet_1k":
-                    model = timm.create_model('swin_base_patch4_window7_224', num_classes=args.num_class, checkpoint_path=args.pretrained_weights)
+                elif args.init.lower() =="imagenet_1k" or args.init.lower() =="imagenet":
+                    model = timm.create_model('swin_base_patch4_window7_224', num_classes=args.num_class, checkpoint_path=args.proxy_dir)
 
                     
             elif args.model_name.lower() == "swin_tiny": 
                 model = timm.create_model('swin_tiny_patch4_window7_224', num_classes=args.num_class)
-                load_pretrained_weights(model, args.init.lower(), args.pretrained_weights)
+                load_proxy_dir(model, args.init.lower(), args.proxy_dir)
             
         if model is None:
             print("Not provide {} pretrained weights for {}.".format(args.init, args.model_name))
             raise Exception("Please provide correct parameters to load the model!")
     else:
         if args.init.lower() =="random" or args.init.lower() =="imagenet":
-            model = ClassificationNet(args.model_name.lower(), args.num_class, weight=args.init,
+            model = ClassificationNet(args.model_name.lower(), args.num_class, args, weight=args.init,
                                 activation=args.activate)
 
         else:
-            model = ClassificationNet(args.model_name.lower(), args.num_class, weight=args.proxy_dir,
+            model = ClassificationNet(args.model_name.lower(), args.num_class, args, weight=args.proxy_dir,
                                 activation=args.activate)
 
     return model
 
 
-def load_pretrained_weights(model, init, pretrained_weights):
-    checkpoint = torch.load(pretrained_weights, map_location="cpu")
+def load_proxy_dir(model, init, proxy_dir):
+    checkpoint = torch.load(proxy_dir, map_location="cpu")
     if init =="dino":
         checkpoint_key = "teacher"
         if checkpoint_key is not None and checkpoint_key in checkpoint:
@@ -260,7 +269,7 @@ def load_pretrained_weights(model, init, pretrained_weights):
     elif init == "mae":
         state_dict = checkpoint['model']     
     else:
-        print("Trying to load the checkpoint for {} at {}, but we cannot guarantee the success.".format(init, pretrained_weights))
+        print("Trying to load the checkpoint for {} at {}, but we cannot guarantee the success.".format(init, proxy_dir))
         
     msg = model.load_state_dict(state_dict, strict=False)
     print('Loaded with msg: {}'.format(msg))
