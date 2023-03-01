@@ -12,6 +12,7 @@ import resnet_wider
 import densenet
 import simmim
 from gmml.model_utils import get_prepared_checkpoint, LabelTokenViT
+import gmml.data_transformations
 
 
 def ClassificationNet(arch_name, num_class, args, conv=None, weight=None, activation=None):
