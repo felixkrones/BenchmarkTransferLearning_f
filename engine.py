@@ -7,11 +7,9 @@ import numpy as np
 from optparse import OptionParser
 from tqdm import tqdm
 import copy
-
-
 from models import build_classification_model, save_checkpoint
 from utils import metric_AUROC
-
+from sklearn.metrics import accuracy_score
 import torch
 import torch.backends.cudnn as cudnn
 from torch.utils.data import DataLoader
@@ -19,6 +17,10 @@ from torch.optim.lr_scheduler import ReduceLROnPlateau
 from trainer import train_one_epoch,test_classification,evaluate,test_segmentation
 import segmentation_models_pytorch as smp
 from utils import cosine_anneal_schedule,dice,mean_dice_coef
+
+from timm.scheduler import create_scheduler
+from timm.optim import create_optimizer
+from timm.utils import NativeScaler
 
 
 sys.setrecursionlimit(40000)
@@ -55,7 +57,12 @@ def classification_engine(args, model_path, output_path, diseases, dataset_train
       best_val_loss = init_loss
       patience_counter = 0
       save_model_path = os.path.join(model_path, experiment)
-      criterion = torch.nn.BCELoss()
+      if "vit" in args.model_name.lower():
+        criterion = torch.nn.BCEWithLogitsLoss()
+        if args.data_set == "RSNAPneumonia":
+          criterion = torch.nn.CrossEntropyLoss()
+      else:
+        criterion = torch.nn.BCELoss()
 
       model = build_classification_model(args)
 
@@ -65,8 +72,13 @@ def classification_engine(args, model_path, output_path, diseases, dataset_train
 
       parameters = list(filter(lambda p: p.requires_grad, model.parameters()))
 
-      optimizer = torch.optim.Adam(parameters, lr=args.lr)
-      lr_scheduler = ReduceLROnPlateau(optimizer, factor=0.5, patience=args.patience // 2, mode='min',
+      if "vit" in args.model_name.lower():
+        optimizer = create_optimizer(args, model)
+        loss_scaler = NativeScaler()
+        lr_scheduler, _ = create_scheduler(args, optimizer)
+      else:
+        optimizer = torch.optim.Adam(parameters, lr=args.lr)
+        lr_scheduler = ReduceLROnPlateau(optimizer, factor=0.5, patience=args.patience // 2, mode='min',
                                        threshold=0.0001, min_lr=0, verbose=True)
 
 
@@ -154,6 +166,7 @@ def classification_engine(args, model_path, output_path, diseases, dataset_train
         f.close()
   mean_auc_test = []
   mean_auc_all = []
+  accuracy = []
   with open(log_file, 'r') as reader, open(output_file, 'a') as writer:
     experiment = reader.readline()
     print(">> Disease = {}".format(diseases))
@@ -172,6 +185,12 @@ def classification_engine(args, model_path, output_path, diseases, dataset_train
       y_test, p_test = test_classification(saved_model, data_loader_test, device, args)
       all_results = metric_AUROC(y_test, p_test, args.num_class)
 
+      if args.data_set == "RSNAPneumonia":
+        acc = accuracy_score(np.argmax(y_test.cpu().numpy(),axis=1),np.argmax(p_test.cpu().numpy(),axis=1))
+        print(">>{}: ACCURACY = {}".format(experiment,acc))
+        writer.write(
+          "{}: ACCURACY = {}\n".format(experiment, np.array2string(np.array(acc), precision=4, separator='\t')))
+        accuracy.append(acc)
       if test_diseases is not None:
         y_test = copy.deepcopy(y_test[:,test_diseases])
         p_test = copy.deepcopy(p_test[:, test_diseases])
