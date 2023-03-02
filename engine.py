@@ -84,7 +84,7 @@ def classification_engine(args, model_path, output_path, diseases, dataset_train
           print("=> loaded checkpoint '{}' (epoch={:04d}, val_loss={:.5f})"
                 .format(resume, start_epoch, init_loss))
         else:
-          print("=> no checkpoint found at '{}'".format(args.resume))
+          print("=> no checkpoint found at '{}'".format(resume))
 
 
 
@@ -144,6 +144,7 @@ def classification_engine(args, model_path, output_path, diseases, dataset_train
     if args.proxy_dir is None:
       raise FileNotFoundError("log_file ({}) not exists!".format(log_file))
     else:
+      print("Using procx_dir as log_file")
       saved_model = args.proxy_dir
       load_pretrained = True
       with open(log_file, 'a') as f:
@@ -162,7 +163,10 @@ def classification_engine(args, model_path, output_path, diseases, dataset_train
       if load_pretrained:
         saved_model = os.path.join(args.proxy_dir)
       else:
-        saved_model = os.path.join(model_path, experiment + ".pth.tar")
+          if model_path in experiment:
+            saved_model = os.path.join(experiment + f"_{args.best}.pth.tar")
+          else:
+            saved_model = os.path.join(model_path, experiment + f"_{args.best}.pth.tar") 
 
       y_test, p_test = test_classification(saved_model, data_loader_test, device, args)
       all_results = metric_AUROC(y_test, p_test, args.num_class)

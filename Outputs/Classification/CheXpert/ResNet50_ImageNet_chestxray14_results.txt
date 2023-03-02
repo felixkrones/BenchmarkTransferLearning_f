@@ -1,2 +1,35 @@
 Disease = ['No Finding', 'Enlarged Cardiomediastinum', 'Cardiomegaly', 'Lung Opacity', 'Lung Lesion', 'Edema', 'Consolidation', 'Pneumonia', 'Atelectasis', 'Pneumothorax', 'Pleural Effusion', 'Pleural Other', 'Fracture', 'Support Devices']
 Disease = ['No Finding', 'Enlarged Cardiomediastinum', 'Cardiomegaly', 'Lung Opacity', 'Lung Lesion', 'Edema', 'Consolidation', 'Pneumonia', 'Atelectasis', 'Pneumothorax', 'Pleural Effusion', 'Pleural Other', 'Fracture', 'Support Devices']
+Disease = ['No Finding', 'Enlarged Cardiomediastinum', 'Cardiomegaly', 'Lung Opacity', 'Lung Lesion', 'Edema', 'Consolidation', 'Pneumonia', 'Atelectasis', 'Pneumothorax', 'Pleural Effusion', 'Pleural Other', 'Fracture', 'Support Devices']
+Disease = ['No Finding', 'Enlarged Cardiomediastinum', 'Cardiomegaly', 'Lung Opacity', 'Lung Lesion', 'Edema', 'Consolidation', 'Pneumonia', 'Atelectasis', 'Pneumothorax', 'Pleural Effusion', 'Pleural Other', 'Fracture', 'Support Devices']
+Disease = ['No Finding', 'Enlarged Cardiomediastinum', 'Cardiomegaly', 'Lung Opacity', 'Lung Lesion', 'Edema', 'Consolidation', 'Pneumonia', 'Atelectasis', 'Pneumothorax', 'Pleural Effusion', 'Pleural Other', 'Fracture', 'Support Devices']
+Disease = ['No Finding', 'Enlarged Cardiomediastinum', 'Cardiomegaly', 'Lung Opacity', 'Lung Lesion', 'Edema', 'Consolidation', 'Pneumonia', 'Atelectasis', 'Pneumothorax', 'Pleural Effusion', 'Pleural Other', 'Fracture', 'Support Devices']
+Disease = ['No Finding', 'Enlarged Cardiomediastinum', 'Cardiomegaly', 'Lung Opacity', 'Lung Lesion', 'Edema', 'Consolidation', 'Pneumonia', 'Atelectasis', 'Pneumothorax', 'Pleural Effusion', 'Pleural Other', 'Fracture', 'Support Devices']
+Disease = ['No Finding', 'Enlarged Cardiomediastinum', 'Cardiomegaly', 'Lung Opacity', 'Lung Lesion', 'Edema', 'Consolidation', 'Pneumonia', 'Atelectasis', 'Pneumothorax', 'Pleural Effusion', 'Pleural Other', 'Fracture', 'Support Devices']
+Disease = ['No Finding', 'Enlarged Cardiomediastinum', 'Cardiomegaly', 'Lung Opacity', 'Lung Lesion', 'Edema', 'Consolidation', 'Pneumonia', 'Atelectasis', 'Pneumothorax', 'Pleural Effusion', 'Pleural Other', 'Fracture', 'Support Devices']
+ResNet50_ImageNet_chestxray14_run_0: AUC test = [0.8347	0.8389	0.8693	0.9217	0.9239]
+ResNet50_ImageNet_chestxray14_run_0: AUC all = [0.8767	0.6005	0.8389	0.9081	0.3948	0.9217	0.8693	0.7638	0.8347	0.7942
+ 0.9239	0.8455	0.    	0.9076]
+ResNet50_ImageNet_chestxray14_run_0: AUC test = 0.8777
+ResNet50_ImageNet_chestxray14_run_0: AUC all = 0.7486
+ResNet50_ImageNet_chestxray14_run_0: AUC test = [0.8347	0.8389	0.8693	0.9217	0.9239]
+ResNet50_ImageNet_chestxray14_run_0: AUC all = [0.8767	0.6005	0.8389	0.9081	0.3948	0.9217	0.8693	0.7638	0.8347	0.7942
+ 0.9239	0.8455	0.    	0.9076]
+ResNet50_ImageNet_chestxray14_run_0: AUC test = 0.8777
+ResNet50_ImageNet_chestxray14_run_0: AUC all = 0.7486
+ResNet50_ImageNet_chestxray14_run_0: AUC test = [0.8347	0.8389	0.8693	0.9217	0.9239]
+ResNet50_ImageNet_chestxray14_run_0: AUC all = [0.8767	0.6005	0.8389	0.9081	0.3948	0.9217	0.8693	0.7638	0.8347	0.7942
+ 0.9239	0.8455	0.    	0.9076]
+ResNet50_ImageNet_chestxray14_run_0: AUC test = 0.8777
+ResNet50_ImageNet_chestxray14_run_0: AUC all = 0.7486
+ResNet50_ImageNet_chestxray14_run_0: AUC test = [0.8347	0.8389	0.8693	0.9217	0.9239]
+ResNet50_ImageNet_chestxray14_run_0: AUC all = [0.8767	0.6005	0.8389	0.9081	0.3948	0.9217	0.8693	0.7638	0.8347	0.7942
+ 0.9239	0.8455	0.    	0.9076]
+ResNet50_ImageNet_chestxray14_run_0: AUC test = 0.8777
+ResNet50_ImageNet_chestxray14_run_0: AUC all = 0.7486
+All trials: test mAUC  = [0.8777	0.8777	0.8777	0.8777]
+Mean AUC over All test trials = 0.8777
+STD over All test trials:  = 0.0000
+All trials: all mAUC  = [0.7486	0.7486	0.7486	0.7486]
+Mean AUC over All all trials = 0.7486
+STD over All all trials:  = 0.0000
