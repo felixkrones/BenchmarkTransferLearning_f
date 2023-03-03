@@ -20,7 +20,9 @@ def train_one_epoch(data_loader_train, device,model, criterion, optimizer, epoch
     samples, targets = samples.float().to(device), targets.float().to(device)
 
     outputs = model(samples)
-
+    
+    if torch.min(outputs) < 0:
+      outputs = torch.sigmoid(outputs)
     loss = criterion(outputs, targets)
 
     optimizer.zero_grad()
@@ -50,6 +52,8 @@ def evaluate(data_loader_val, device, model, criterion):
       samples, targets = samples.float().to(device), targets.float().to(device)
 
       outputs = model(samples)
+      if torch.min(outputs) < 0:
+        outputs = torch.sigmoid(outputs)
 
       loss = criterion(outputs, targets)
 
