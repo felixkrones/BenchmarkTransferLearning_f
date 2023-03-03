@@ -99,7 +99,7 @@ def get_args_parser():
     parser.add_option("--workers", dest="workers", help="number of CPU workers", default=8, type="int")
     parser.add_option("--print_freq", dest="print_freq", help="print frequency", default=50, type="int")
     parser.add_option("--test_augment", dest="test_augment", help="whether use test time augmentation",
-                      default=True, action="callback", callback=vararg_callback_bool)
+                      default=False, action="callback", callback=vararg_callback_bool)
     parser.add_option("--proxy_dir", dest="proxy_dir", help="Path to the Pretrained model", default=None, type="string")
     parser.add_option("--label_layers", default=0, type=int, help='For GMML, how many label token layers. 12 means introduce LT at the first layer')
     parser.add_option("--anno_percent", dest="anno_percent", help="data percent", default=100, type="int")
@@ -137,10 +137,10 @@ def main(args):
                     'Emphysema', 'Fibrosis', 'Pleural_Thickening', 'Hernia']
         #dataset_train = ChestXray14Dataset_general(images_path=args.data_dir, file_path=args.train_list,augment=build_transform_classification(normalize=args.normalization, mode="train"), possible_labels=diseases)
         #dataset_val = ChestXray14Dataset_general(images_path=args.data_dir, file_path=args.val_list,augment=build_transform_classification(normalize=args.normalization, mode="valid"), possible_labels=diseases)
-        #dataset_test = ChestXray14Dataset_general(images_path=args.data_dir, file_path=args.test_list,augment=build_transform_classification(normalize=args.normalization, mode="test"), possible_labels=diseases)
-        dataset_train = ChestXray14Dataset(images_path=args.data_dir, file_path=args.train_list,augment=build_transform_classification(normalize=args.normalization, mode="train"), num_class=len(diseases))
-        dataset_val = ChestXray14Dataset(images_path=args.data_dir, file_path=args.val_list,augment=build_transform_classification(normalize=args.normalization, mode="valid"), num_class=len(diseases))
-        dataset_test = ChestXray14Dataset(images_path=args.data_dir, file_path=args.test_list,augment=build_transform_classification(normalize=args.normalization, mode="test"), num_class=len(diseases))
+        #dataset_test = ChestXray14Dataset_general(images_path=args.data_dir, file_path=args.test_list,augment=build_transform_classification(normalize=args.normalization, mode="test", test_augment=args.test_augment), possible_labels=diseases)
+        dataset_train = ChestXray14Dataset(images_path=args.data_dir, file_path=args.train_list,augment=build_transform_classification(normalize=args.normalization, mode="train"))
+        dataset_val = ChestXray14Dataset(images_path=args.data_dir, file_path=args.val_list,augment=build_transform_classification(normalize=args.normalization, mode="valid"))
+        dataset_test = ChestXray14Dataset(images_path=args.data_dir, file_path=args.test_list,augment=build_transform_classification(normalize=args.normalization, mode="test", test_augment=args.test_augment))
 
         classification_engine(args, model_path, output_path, diseases, dataset_train, dataset_val, dataset_test)
 
@@ -156,9 +156,9 @@ def main(args):
         dataset_train = CheXpertDataset(images_path=args.data_dir, file_path=args.train_list,
                                         augment=build_transform_classification(normalize=args.normalization, mode="train"), uncertain_label=args.uncertain_label, unknown_label=args.unknown_label, annotation_percent=args.anno_percent, num_class=len(diseases))
         dataset_val = CheXpertDataset(images_path=args.data_dir, file_path=args.val_list,
-                                      augment=build_transform_classification(normalize=args.normalization, mode="valid"), uncertain_label=args.uncertain_label, unknown_label=args.unknown_label, annotation_percent=args.anno_percent, num_class=len(diseases))
+                                      augment=build_transform_classification(normalize=args.normalization, mode="valid"), uncertain_label=args.uncertain_label, unknown_label=args.unknown_label)
         dataset_test = CheXpertDataset(images_path=args.data_dir, file_path=args.test_list,
-                                       augment=build_transform_classification(normalize=args.normalization, mode="test"), uncertain_label=args.uncertain_label, unknown_label=args.unknown_label, annotation_percent=args.anno_percent, num_class=len(diseases))
+                                       augment=build_transform_classification(normalize=args.normalization, mode="test", test_augment=args.test_augment), uncertain_label=args.uncertain_label, unknown_label=args.unknown_label)
 
         print(f"Got dataset {args.data_set}, starting classification_engine.")
         classification_engine(args, model_path, output_path, diseases, dataset_train, dataset_val, dataset_test, test_diseases)
@@ -172,7 +172,7 @@ def main(args):
                                   augment=build_transform_classification(normalize=args.normalization, mode="valid"), annotation_percent=args.anno_percent)
 
         dataset_test = ShenzhenCXR(images_path=args.data_dir, file_path=args.test_list,
-                                   augment=build_transform_classification(normalize=args.normalization, mode="test"), annotation_percent=args.anno_percent)
+                                   augment=build_transform_classification(normalize=args.normalization, mode="test", test_augment=args.test_augment), annotation_percent=args.anno_percent)
 
 
         classification_engine(args, model_path, output_path, diseases, dataset_train, dataset_val, dataset_test)

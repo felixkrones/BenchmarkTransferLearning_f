@@ -3,6 +3,7 @@ from models import ClassificationNet, build_classification_model
 import time
 import torch
 from tqdm import tqdm
+import warnings
 
 
 def train_one_epoch(data_loader_train, device,model, criterion, optimizer, epoch):
@@ -22,6 +23,7 @@ def train_one_epoch(data_loader_train, device,model, criterion, optimizer, epoch
     outputs = model(samples)
     
     if torch.min(outputs) < 0:
+      warnings.warn("Negative output detected. Sigmoid activation is applied.")
       outputs = torch.sigmoid(outputs)
     loss = criterion(outputs, targets)
 
