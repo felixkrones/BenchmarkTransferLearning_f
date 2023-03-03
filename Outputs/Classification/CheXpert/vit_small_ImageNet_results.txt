@@ -1,0 +1,18 @@
+Disease = ['No Finding', 'Enlarged Cardiomediastinum', 'Cardiomegaly', 'Lung Opacity', 'Lung Lesion', 'Edema', 'Consolidation', 'Pneumonia', 'Atelectasis', 'Pneumothorax', 'Pleural Effusion', 'Pleural Other', 'Fracture', 'Support Devices']
+Disease = ['No Finding', 'Enlarged Cardiomediastinum', 'Cardiomegaly', 'Lung Opacity', 'Lung Lesion', 'Edema', 'Consolidation', 'Pneumonia', 'Atelectasis', 'Pneumothorax', 'Pleural Effusion', 'Pleural Other', 'Fracture', 'Support Devices']
+vit_small_ImageNet_run_0: AUC test = [0.4097	0.5498	0.4734	0.6397	0.6842]
+vit_small_ImageNet_run_0: AUC all = [0.6516	0.6341	0.5498	0.564 	0.7253	0.6397	0.4734	0.2445	0.4097	0.5088
+ 0.6842	0.0429	0.    	0.5554]
+vit_small_ImageNet_run_0: AUC test = 0.5514
+vit_small_ImageNet_run_0: AUC all = 0.4774
+vit_small_ImageNet_run_0: AUC test = [0.4097	0.5498	0.4734	0.6397	0.6842]
+vit_small_ImageNet_run_0: AUC all = [0.6516	0.6341	0.5498	0.564 	0.7253	0.6397	0.4734	0.2445	0.4097	0.5088
+ 0.6842	0.0429	0.    	0.5554]
+vit_small_ImageNet_run_0: AUC test = 0.5514
+vit_small_ImageNet_run_0: AUC all = 0.4774
+All trials: test mAUC  = [0.5514	0.5514]
+Mean AUC over All test trials = 0.5514
+STD over All test trials:  = 0.0000
+All trials: all mAUC  = [0.4774	0.4774]
+Mean AUC over All all trials = 0.4774
+STD over All all trials:  = 0.0000
