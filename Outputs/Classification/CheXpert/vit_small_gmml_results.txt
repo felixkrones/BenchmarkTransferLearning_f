@@ -1,0 +1,12 @@
+Disease = ['No Finding', 'Enlarged Cardiomediastinum', 'Cardiomegaly', 'Lung Opacity', 'Lung Lesion', 'Edema', 'Consolidation', 'Pneumonia', 'Atelectasis', 'Pneumothorax', 'Pleural Effusion', 'Pleural Other', 'Fracture', 'Support Devices']
+vit_small_gmml_run_0: AUC test = [0.651 	0.3308	0.2887	0.732 	0.7657]
+vit_small_gmml_run_0: AUC all = [0.7237	0.2563	0.3308	0.7504	0.1116	0.732 	0.2887	0.4834	0.651 	0.5559
+ 0.7657	0.7554	0.    	0.6507]
+vit_small_gmml_run_0: AUC test = 0.5536
+vit_small_gmml_run_0: AUC all = 0.5040
+All trials: test mAUC  = [0.5536]
+Mean AUC over All test trials = 0.5536
+STD over All test trials:  = 0.0000
+All trials: all mAUC  = [0.504]
+Mean AUC over All all trials = 0.5040
+STD over All all trials:  = 0.0000
