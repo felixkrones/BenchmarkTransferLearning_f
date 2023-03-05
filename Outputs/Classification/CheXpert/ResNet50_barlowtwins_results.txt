@@ -1,0 +1,12 @@
+Disease = ['No Finding', 'Enlarged Cardiomediastinum', 'Cardiomegaly', 'Lung Opacity', 'Lung Lesion', 'Edema', 'Consolidation', 'Pneumonia', 'Atelectasis', 'Pneumothorax', 'Pleural Effusion', 'Pleural Other', 'Fracture', 'Support Devices']
+ResNet50_barlowtwins_run_0: AUC test = [0.82  	0.8481	0.8868	0.9066	0.9144]
+ResNet50_barlowtwins_run_0: AUC all = [0.8789	0.5867	0.8481	0.8965	0.1288	0.9066	0.8868	0.7046	0.82  	0.7992
+ 0.9144	0.8155	0.    	0.8736]
+ResNet50_barlowtwins_run_0: AUC test = 0.8752
+ResNet50_barlowtwins_run_0: AUC all = 0.7186
+All trials: test mAUC  = [0.8752]
+Mean AUC over All test trials = 0.8752
+STD over All test trials:  = 0.0000
+All trials: all mAUC  = [0.7186]
+Mean AUC over All all trials = 0.7186
+STD over All all trials:  = 0.0000
