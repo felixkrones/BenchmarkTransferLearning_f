@@ -41,7 +41,7 @@ def get_args_parser():
     parser.add_option("--test_list", dest="test_list", help="file for test list",
                       default=None, type="string")
     parser.add_option("--mode", dest="mode", help="train | test", default="train", type="string")
-    parser.add_option("--batch_size", dest="batch_size", help="batch size", default=32, type="int")
+    parser.add_option("--batch_size", dest="batch_size", help="batch size", default=128, type="int")
     parser.add_option("--epochs", dest="num_epoch", help="num of epoches", default=20, type="int")
     # Optimizer parameters
     parser.add_option("--optimizer", dest="optimizer", help="Adam | SGD", default="Adam", type="string")
