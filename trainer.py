@@ -42,7 +42,7 @@ def train_one_epoch(data_loader_train, device,model, criterion, optimizer, epoch
       progress.display(i)
 
 
-def evaluate(data_loader_val, device, model, criterion):
+def evaluate(data_loader_val, device, model, criterion, args):
   model.eval()
 
   with torch.no_grad():

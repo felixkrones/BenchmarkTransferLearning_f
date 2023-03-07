@@ -104,7 +104,7 @@ def classification_engine(args, model_path, output_path, diseases, dataset_train
         print(f"Training epoch: {[epoch//args.num_epoch]}")
         train_one_epoch(data_loader_train,device, model, criterion, optimizer, epoch)
         print(f"Trained epoch: {[epoch//args.num_epoch]}")
-        val_loss = evaluate(data_loader_val, device,model, criterion)
+        val_loss = evaluate(data_loader_val, device,model, criterion, args)
 
         lr_scheduler.step(val_loss)
 
@@ -266,7 +266,7 @@ def segmentation_engine(args, model_path, dataset_train, dataset_val, dataset_te
 
     for epoch in range(start_num_epochs, args.epochs):
         train_one_epoch(data_loader_train,device, model, criterion, optimizer, epoch)
-        val_loss = evaluate(data_loader_val, device,model, criterion)
+        val_loss = evaluate(data_loader_val, device,model, criterion, args)
         # update learning rate
         lr_ = cosine_anneal_schedule(epoch,args.epochs,args.learning_rate)
         for param_group in optimizer.param_groups:
