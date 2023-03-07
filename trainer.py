@@ -1,9 +1,12 @@
+import numpy as np
 from utils import MetricLogger, ProgressLogger
 from models import ClassificationNet, build_classification_model
 import time
 import torch
 from tqdm import tqdm
 import warnings
+
+from gmml.model_utils import metric_AUROC
 
 
 def train_one_epoch(data_loader_train, device,model, criterion, optimizer, epoch):
@@ -49,15 +52,21 @@ def evaluate(data_loader_val, device, model, criterion):
       len(data_loader_val),
       [batch_time, losses], prefix='Val: ')
 
+    p_out = torch.FloatTensor().to(device)
+    t_out = torch.FloatTensor().to(device)
+
     end = time.time()
     for i, (samples, targets) in enumerate(data_loader_val):
       samples, targets = samples.float().to(device), targets.float().to(device)
 
       outputs = model(samples)
-      if torch.min(outputs) < 0:
-        outputs = torch.sigmoid(outputs)
+      #if torch.min(outputs) < 0:
+      #  outputs = torch.sigmoid(outputs)
 
       loss = criterion(outputs, targets)
+
+      p_out = torch.cat((p_out, outputs), 0)
+      t_out = torch.cat((t_out, targets), 0)
 
       losses.update(loss.item(), samples.size(0))
       losses.update(loss.item(), samples.size(0))
@@ -66,6 +75,14 @@ def evaluate(data_loader_val, device, model, criterion):
 
       if i % 50 == 0:
         progress.display(i)
+
+    AUC_all = metric_AUROC(t_out, p_out)
+    AUC_mean = np.mean(AUC_all)
+
+    print(f"Validation AUC_mean: {AUC_mean:.4f}, AUC_all: {AUC_all}")
+    if args is not None and args.data_set == "CheXpert":
+      AUC_mean_5 = np.mean(np.array(AUC_all)[[2,5,6,8,10]])
+      print(f"Validation AUC_mean_5: {AUC_mean_5:.4f}")
 
   return losses.avg
 
