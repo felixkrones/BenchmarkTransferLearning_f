@@ -31,6 +31,7 @@ def get_args_parser():
     parser.add_option("--normalization", dest="normalization", help="how to normalize data (imagenet|chestx-ray)", default="imagenet",
                       type="string")
     parser.add_option("--img_size", dest="img_size", help="input image resolution", default=224, type="int")
+    parser.add_option("--nc", dest="nc", help="num of image channels", default=3, type="int")
     parser.add_option("--img_depth", dest="img_depth", help="num of image depth", default=3, type="int")
     parser.add_option("--data_dir", dest="data_dir", help="dataset dir",default="data/", type="string")
     parser.add_option("--train_list", dest="train_list", help="file for training list",
@@ -41,7 +42,7 @@ def get_args_parser():
                       default=None, type="string")
     parser.add_option("--mode", dest="mode", help="train | test", default="train", type="string")
     parser.add_option("--batch_size", dest="batch_size", help="batch size", default=32, type="int")
-    parser.add_option("--num_epoch", dest="num_epoch", help="num of epoches", default=20, type="int")
+    parser.add_option("--epochs", dest="num_epoch", help="num of epoches", default=20, type="int")
     # Optimizer parameters
     parser.add_option("--optimizer", dest="optimizer", help="Adam | SGD", default="Adam", type="string")
     parser.add_option('--opt', default='momentum', type=str, metavar='OPTIMIZER',
@@ -61,7 +62,7 @@ def get_args_parser():
     # Learning rate schedule parameters
     parser.add_option('--sched', default='cosine', type=str, metavar='SCHEDULER',
                         help='LR scheduler (default: "cosine"')
-    parser.add_option("--lr", dest="lr", help="learning rate", default=2e-4, type="float")
+    parser.add_option("--lr", dest="lr", help="learning rate", default=1e-4, type="float")
     parser.add_option("--lr_Scheduler", dest="lr_Scheduler", help="learning schedule", default="ReduceLROnPlateau",
                       type="string")
     parser.add_option('--lr-noise', type=float, nargs='+', default=None, metavar='pct, pct',
@@ -154,11 +155,11 @@ def main(args):
         test_diseases_name = ['Atelectasis', 'Cardiomegaly', 'Consolidation', 'Edema', 'Pleural Effusion']
         test_diseases = [diseases.index(c) for c in test_diseases_name]
         dataset_train = CheXpertDataset(images_path=args.data_dir, file_path=args.train_list,
-                                        augment=build_transform_classification(normalize=args.normalization, mode="train"), uncertain_label=args.uncertain_label, unknown_label=args.unknown_label, annotation_percent=args.anno_percent, num_class=len(diseases))
+                                        augment=build_transform_classification(normalize=args.normalization, mode="train", nc=args.nc), uncertain_label=args.uncertain_label, unknown_label=args.unknown_label, annotation_percent=args.anno_percent, num_class=len(diseases), nc=args.nc)
         dataset_val = CheXpertDataset(images_path=args.data_dir, file_path=args.val_list,
-                                      augment=build_transform_classification(normalize=args.normalization, mode="valid"), uncertain_label=args.uncertain_label, unknown_label=args.unknown_label)
+                                      augment=build_transform_classification(normalize=args.normalization, mode="valid", nc=args.nc), uncertain_label=args.uncertain_label, unknown_label=args.unknown_label, nc=args.nc)
         dataset_test = CheXpertDataset(images_path=args.data_dir, file_path=args.test_list,
-                                       augment=build_transform_classification(normalize=args.normalization, mode="test", test_augment=args.test_augment), uncertain_label=args.uncertain_label, unknown_label=args.unknown_label)
+                                       augment=build_transform_classification(normalize=args.normalization, mode="test", test_augment=args.test_augment, nc=args.nc), uncertain_label=args.uncertain_label, unknown_label=args.unknown_label, nc=args.nc)
 
         print(f"Got dataset {args.data_set}, starting classification_engine.")
         classification_engine(args, model_path, output_path, diseases, dataset_train, dataset_val, dataset_test, test_diseases)

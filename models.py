@@ -98,18 +98,11 @@ def build_classification_model(args):
                     load_proxy_dir(model, args.init.lower(), args.proxy_dir)
                 
             elif args.model_name.lower() == "vit_small":
-                if args.init.lower() == "gmml":
-                    model = VisionTransformer(num_classes=args.num_class,
+                model = VisionTransformer(in_chans=args.nc, num_classes=args.num_class,
                         patch_size=16, embed_dim=384, depth=12, num_heads=6, mlp_ratio=4, qkv_bias=True,
                         norm_layer=partial(nn.LayerNorm, eps=1e-6))
-                    model = get_prepared_checkpoint(model, args.proxy_dir)
-                    #model = LabelTokenViT(args.num_class, model, label_layers=args.label_layers)
-                else:
-                    model = VisionTransformer(num_classes=args.num_class,
-                            patch_size=16, embed_dim=384, depth=12, num_heads=6, mlp_ratio=4, qkv_bias=True,
-                            norm_layer=partial(nn.LayerNorm, eps=1e-6))
-                    model.default_cfg = _cfg()
-                    load_proxy_dir(model, args.init.lower(), args.proxy_dir)  
+                model.default_cfg = _cfg()
+                model = load_proxy_dir(model, args.init.lower(), args.proxy_dir) 
                 
             elif args.model_name.lower() == "swin_base":
                 if args.init.lower() == "simmim":
@@ -278,7 +271,9 @@ def load_proxy_dir(model, init, proxy_dir):
         state_dict = checkpoint['model']
         state_dict = {k.replace('encoder.', ''): v for k, v in state_dict.items() if 'encoder.' in k}
     elif init == "mae":
-        state_dict = checkpoint['model']     
+        state_dict = checkpoint['model']  
+    elif "gmml" in init:
+        state_dict = get_prepared_checkpoint(model, proxy_dir)   
     else:
         print("Trying to load the checkpoint for {} at {}, but we cannot guarantee the success.".format(init, proxy_dir))
         

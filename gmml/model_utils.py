@@ -1,6 +1,22 @@
 import torch
 import torch.nn as nn
+from sklearn.metrics import roc_auc_score
 from timm.models.layers import trunc_normal_
+
+
+def metric_AUROC(target, output, nb_classes=14):
+    outAUROC = []
+
+    target = target.cpu().numpy()
+    output = output.cpu().numpy()
+
+    for i in range(nb_classes):
+        if target[:, i].sum() != 0:
+            outAUROC.append(roc_auc_score(target[:, i], output[:, i]))
+        else:
+            outAUROC.append(0)
+
+    return outAUROC
 
 
 def get_prepared_checkpoint(model, checkpoint_path):
@@ -34,11 +50,8 @@ def get_prepared_checkpoint(model, checkpoint_path):
         print(f"Number of channels in pretrained model {checkpoint_model['patch_embed.proj.weight'].shape} is not same as the model {state_dict['patch_embed.proj.weight'].shape}. Converting the pretrained model")
         checkpoint_model['patch_embed.proj.weight'] = checkpoint_model['patch_embed.proj.weight'].repeat(1, state_dict['patch_embed.proj.weight'].shape[1], 1, 1)
         print(f"New shape of pretrained model {checkpoint_model['patch_embed.proj.weight'].shape}")
-        
-    msg = model.load_state_dict(checkpoint_model, strict=False)
-    # print(msg)
     
-    return model
+    return checkpoint_model
 
 
 class LabelTokenViT(nn.Module):

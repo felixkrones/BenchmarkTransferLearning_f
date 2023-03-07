@@ -26,13 +26,23 @@ from albumentations import (
 
 
 
-def build_transform_classification(normalize, crop_size=224, resize=256, mode="train", test_augment=False):
+def build_transform_classification(normalize, crop_size=224, resize=256, mode="train", test_augment=False, nc=3):
     transformations_list = []
 
     if normalize.lower() == "imagenet":
-      normalize = transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])
+      if nc == 3:
+        normalize = transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])
+      elif nc == 1:
+        normalize = transforms.Normalize((0.485), (0.229))
+      else:
+        raise ValueError("nc should be 1 or 3")
     elif normalize.lower() == "chestx-ray":
-      normalize = transforms.Normalize([0.5056, 0.5056, 0.5056], [0.252, 0.252, 0.252])
+      if nc == 3:
+        normalize = transforms.Normalize([0.5056, 0.5056, 0.5056], [0.252, 0.252, 0.252])
+      elif nc == 1:
+        normalize = transforms.Normalize((0.5056), (0.252))
+      else:
+        raise ValueError("nc should be 1 or 3")
     elif normalize.lower() == "none":
       normalize = None
     else:
@@ -203,11 +213,12 @@ class ChestXray14Dataset(Dataset):
 class CheXpertDataset(Dataset):
 
   def __init__(self, images_path, file_path, augment, num_class=14,
-               uncertain_label="LSR-Ones", unknown_label=0, annotation_percent=100):
+               uncertain_label="LSR-Ones", unknown_label=0, annotation_percent=100, nc=3):
 
     self.img_list = []
     self.img_label = []
     self.augment = augment
+    self.nc = nc
     assert uncertain_label in ["Ones", "Zeros", "LSR-Ones", "LSR-Zeros"]
     self.uncertain_label = uncertain_label
 
@@ -251,7 +262,15 @@ class CheXpertDataset(Dataset):
 
     imagePath = self.img_list[index]
 
-    imageData = Image.open(imagePath).convert('RGB')
+    imageData = Image.open(imagePath)
+    if self.nc == 3:
+      if imageData.mode != 'RGB':
+        imageData = imageData.convert('RGB')
+    elif self.nc == 1:
+      if imageData.mode != 'L':
+        imageData = imageData.convert('L')
+    else:
+      raise Exception("Invalid number of channels")
 
     label = []
     for l in self.img_label[index]:
