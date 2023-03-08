@@ -27,7 +27,7 @@ def get_args_parser():
                       default="Random", type="string")
     parser.add_option("--num_class", dest="num_class", help="number of the classes in the downstream task",
                       default=14, type="int")
-    parser.add_option("--data_set", dest="data_set", help="ChestXray14|CheXpert", default="ChestXray14", type="string")
+    parser.add_option("--data_set", dest="data_set", help="ChestXray14|CheXpert|padchest", default="ChestXray14", type="string")
     parser.add_option("--normalization", dest="normalization", help="how to normalize data (imagenet|chestx-ray)", default="imagenet",
                       type="string")
     parser.add_option("--img_size", dest="img_size", help="input image resolution", default=224, type="int")
@@ -130,9 +130,9 @@ def main(args):
     args.exp_name = args.model_name + "_" + args.init
     model_path = os.path.join("./models/Classification",args.data_set)
     output_path = os.path.join("./Outputs/Classification",args.data_set)
+    diseases = ["Atelectasis", "Cardiomegaly", "Consolidation", "Edema", "Pneumonia", "Pneumothorax", 'No Finding']
 
     if args.data_set == "ChestXray14":
-        diseases = ["Atelectasis", "Cardiomegaly", "Consolidation", "Edema", "Pneumonia", "Pneumothorax", 'No Finding']
         diseases = ['Atelectasis', 'Cardiomegaly', 'Effusion', 'Infiltration', 'Mass', 'Nodule',
                     'Pneumonia', 'Pneumothorax', 'Consolidation', 'Edema',
                     'Emphysema', 'Fibrosis', 'Pleural_Thickening', 'Hernia']
@@ -147,11 +147,9 @@ def main(args):
 
 
     elif args.data_set == "CheXpert":
-        diseases = ["Atelectasis", "Cardiomegaly", "Consolidation", "Edema", "Pneumonia", "Pneumothorax", 'No Finding']
         diseases = ['No Finding', 'Enlarged Cardiomediastinum', 'Cardiomegaly', 'Lung Opacity',
                            'Lung Lesion', 'Edema', 'Consolidation', 'Pneumonia', 'Atelectasis', 'Pneumothorax',
                            'Pleural Effusion', 'Pleural Other', 'Fracture', 'Support Devices']
-        test_diseases_name = diseases
         test_diseases_name = ['Atelectasis', 'Cardiomegaly', 'Consolidation', 'Edema', 'Pleural Effusion']
         test_diseases = [diseases.index(c) for c in test_diseases_name]
         dataset_train = CheXpertDataset(images_path=args.data_dir, file_path=args.train_list,
@@ -164,6 +162,7 @@ def main(args):
         print(f"Got dataset {args.data_set}, starting classification_engine.")
         classification_engine(args, model_path, output_path, diseases, dataset_train, dataset_val, dataset_test, test_diseases)
 
+
     elif args.data_set == "Shenzhen":
         diseases = ['TB']
         dataset_train = ShenzhenCXR(images_path=args.data_dir, file_path=args.train_list,
@@ -175,6 +174,14 @@ def main(args):
         dataset_test = ShenzhenCXR(images_path=args.data_dir, file_path=args.test_list,
                                    augment=build_transform_classification(normalize=args.normalization, mode="test", test_augment=args.test_augment), annotation_percent=args.anno_percent)
 
+
+        classification_engine(args, model_path, output_path, diseases, dataset_train, dataset_val, dataset_test)
+
+
+    elif args.data_set == "padchest":
+        dataset_train = PadchestDataset(images_path=args.data_dir, file_path=args.train_list, augment=build_transform_classification(normalize=args.normalization, mode="train"))
+        dataset_val = PadchestDataset(images_path=args.data_dir, file_path=args.val_list, augment=build_transform_classification(normalize=args.normalization, mode="valid"))
+        dataset_test = PadchestDataset(images_path=args.data_dir, file_path=args.test_list, augment=build_transform_classification(normalize=args.normalization, mode="test", test_augment=args.test_augment))
 
         classification_engine(args, model_path, output_path, diseases, dataset_train, dataset_val, dataset_test)
 

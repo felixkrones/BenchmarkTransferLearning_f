@@ -259,7 +259,7 @@ def load_proxy_dir(model, init, proxy_dir):
         # remove `backbone.` prefix induced by multicrop wrapper
         state_dict = {k.replace("backbone.", ""): v for k, v in state_dict.items()}
     elif init =="moco_v3":
-        state_dict = checkpoint['state_dict']
+        state_dict = checkpoint
         for k in list(state_dict.keys()):
             # retain only base_encoder up to before the embedding layer
             if k.startswith('module.base_encoder') and not k.startswith('module.base_encoder.head'):

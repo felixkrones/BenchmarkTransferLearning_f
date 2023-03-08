@@ -1,0 +1,13 @@
+Disease = ['Atelectasis', 'Cardiomegaly', 'Effusion', 'Infiltration', 'Mass', 'Nodule', 'Pneumonia', 'Pneumothorax', 'Consolidation', 'Edema', 'Emphysema', 'Fibrosis', 'Pleural_Thickening', 'Hernia']
+ResNet50_moco_v2_run_0: AUC test = [0.7491	0.8795	0.8123	0.6912	0.7861	0.6993	0.706 	0.8329	0.7416	0.8403
+ 0.8389	0.792 	0.7435	0.872 ]
+ResNet50_moco_v2_run_0: AUC all = [0.7491	0.8795	0.8123	0.6912	0.7861	0.6993	0.706 	0.8329	0.7416	0.8403
+ 0.8389	0.792 	0.7435	0.872 ]
+ResNet50_moco_v2_run_0: AUC test = 0.7846
+ResNet50_moco_v2_run_0: AUC all = 0.7846
+All trials: test mAUC  = [0.7846]
+Mean AUC over All test trials = 0.7846
+STD over All test trials:  = 0.0000
+All trials: all mAUC  = [0.7846]
+Mean AUC over All all trials = 0.7846
+STD over All all trials:  = 0.0000

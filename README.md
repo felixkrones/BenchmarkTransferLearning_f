@@ -1,4 +1,72 @@
-# A Systematic Benchmarking Analysis of Transfer Learning for Medical Image Analysis
+# Extended: A Systematic Benchmarking Analysis of Transfer Learning for Medical Image Analysis
+
+## Extended work
+This is our extension for the repository described below, as we used it in our [Paper]().
+Please cite both if you find it helpful. We thank the original authors!
+It mainly extends the original repository in the following five ways:
+- Extended dataset support
+- Extended model support
+- Extended parameterisation
+- Extended device support
+- Our parameter settings
+- Updated requirements.txt file
+- Added evaluation pipeline: `pipeline_eval.ipynb`
+
+### Getting started
+You can just use the repository as decribed in the original README below.
+Jost prepare the resnet moco checkpoints first using `prep_moco.py` (provide the paths in the file, dont do it for vit).
+This runs the code from `download_and_prepare_models.py` on already downloaded moco files.
+You need to use deit-converted checkpoints (see moco-v3 docu).
+
+### Getting the additional data
+- General tips
+  - Unzip files
+    - `unzip images.zip`
+    - `find . -name '*.tar.gz' -exec tar -xf '{}' \;`
+  - Deleting files
+    - `find . -name '*.tar.gz' -exec rm '{}' \;`
+    - `rm images/batch_download_zips.py`
+  - Think about where to save files and create folders
+    - `mkdir data/raw/name && cd "$_"`
+- NIH ChestXray 14:
+  - Download data from [box](https://nihcc.app.box.com/v/ChestXray-NIHCC)
+  - Download the `images/` folder (there is a nice Python script provided)
+  - Download the metadata file `Data_Entry_2017_v2020.csv`
+  - Download the split files `https://nihcc.app.box.com/v/ChestXray-NIHCC/file/256056636701` and `https://nihcc.app.box.com/v/ChestXray-NIHCC/file/256055473534`
+  - Or download the split files from [Seyyed et al.](https://github.com/LalehSeyyed/Underdiagnosis_NatMed/tree/main/NIH/Splits)
+- ChestXpert
+    1. Download data from [CheXpert dataset](https://stanfordmlgroup.github.io/competitions/chexpert/)
+        - Either by directly downloading the zip file 
+        - Or by using [AzCopy](https://learn.microsoft.com/en-us/azure/storage/common/storage-use-azcopy-v10):
+            - Install AzCopy `sudo bash -c "cd /usr/local/bin; curl -L https://aka.ms/downloadazcopy-v10-linux | tar --strip-components=1 --exclude=*.txt -xzvf -; chmod +x azcopy"`
+            - Get [Link](https://stanfordaimi.azurewebsites.net/datasets/8cbd9ed4-2eb9-4565-affc-111cf4f7ebe2)
+            - Download: `azcopy copy "LINK" "." --recursive=true`
+    2. Create/Copy split file into this folder
+        - Either create own file
+        - Or use file from [Glocker et al.](https://github.com/biomedia-mira/chexploration/tree/main/datafiles/chexpert)
+    3. Unzip all files
+        - `cd chexpertchestxrays-u20210408 && unzip CheXpert-v1.0.zip`
+- Padchest
+  1. Download the data from [Padchest](https://bimcv.cipf.es/bimcv-projects/padchest/)
+    - Not all, maybe only the 0.zip file. This gives you 1861 manually labelled, frontal view images
+    1. Download the [metadata file](https://b2drop.bsc.es/index.php/s/BIMCV-PadChest-FULL/download?path=%2F&files=PADCHEST_chest_x_ray_images_labels_160K_01.02.19.csv.gz)
+    2. Download the 0.zip folder
+
+
+
+### Running code in parallel
+Run from terminal `torchrun --nproc_per_node=NUM_GPUS_YOU_HAVE ...`
+
+### Running code in background using tmux
+1. SSH connect
+2. `tmux`
+3. Detach: `tmux detach` or `Ctrl+b then d`
+4. List sessions: `tmux list-sessions`
+4. Resume: `tmux attach -t session_number`
+
+
+## Original work
+
 We provide the first fine-grained and up-to-date study on the transferability of various brand-new pre-training techniques for medical imaging tasks. In particular, we conduct a systematic study on the transferability of (1) models pre-trained on [iNat2021](https://github.com/visipedia/newt), the most recent large-scale fine-grained dataset, (2) 14 top self-supervised ImageNet models, and (3) domain-adapted models that are continuously pre-trained on natural and medical datasets.
 
 In this repository we release multiple models from our paper as well as the code to fine-tuning the released models in desired target tasks. 

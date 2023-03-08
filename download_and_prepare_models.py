@@ -80,9 +80,10 @@ def convert_byol(tf_path, pth_path):
 
 
 class LoadedResNet(nn.Module):
-    def __init__(self, model_name):
+    def __init__(self, model_name, model_path=None):
         super().__init__()
         self.model_name = model_name
+        self.model_path = model_path
 
         if model_name == 'supervised':
             self.model = models.resnet50(pretrained=True)
@@ -90,8 +91,10 @@ class LoadedResNet(nn.Module):
         else:
             self.model = models.resnet50(pretrained=False)
             del self.model.fc
-
-            path = os.path.join('models', f'{self.model_name}.pth')
+            if self.model_path is None:
+                path = os.path.join('models', f'{self.model_name}.pth')
+            else:
+                path = self.model_path
             print(path)
             state_dict = torch.load(path, map_location=torch.device('cpu'))
             if 'state_dict' in state_dict:
@@ -140,6 +143,7 @@ class LoadedResNet(nn.Module):
             'sela-v2': 'module.',
             'moco-v1': 'module.encoder_q.',
             'moco-v2': 'module.encoder_q.',
+            'moco-v3': 'module.encoder_q.',
             'cmc': 'module.encoder1.',
             'infomin': 'module.encoder.',
             'insdis': 'module.encoder.',

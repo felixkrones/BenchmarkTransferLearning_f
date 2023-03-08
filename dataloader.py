@@ -98,6 +98,52 @@ def build_transform_segmentation():
   return AUGMENTATIONS_TRAIN
 
 
+class PadchestDataset(Dataset):
+  def __init__(self, images_path, file_path, augment, possible_labels):
+    self.img_path_col = "ImageID"
+    self.label_col = "Labels"
+    self.filter_dir = {
+       "Projection": ["PA", "AP"],
+       "ImageDir": [0],
+       "MethodProjection": ["Manual review of DICOM fields"]
+    }
+    self.transform = augment
+    self.annotation_file = pd.read_csv(file_path)
+
+    # Filder the data based on self.filter_dir
+    for key, value in self.filter_dir.items():
+      self.annotation_file = self.annotation_file[self.annotation_file[key].isin(value)]
+    
+    # Get image paths
+    self.img_list = [os.path.join(images_path, x) for x in self.annotation_file[self.img_path_col].values]
+
+    # Get labels 
+    for p in possible_labels:
+      if p == "No Finding":
+         p = "normal"
+      self.annotation_file[p] = self.annotation_file[self.label_col].apply(lambda x: 1 if p.lower() in x else 0)
+    self.img_label = self.annotation_file[possible_labels].values
+
+    self.annotation_file.to_csv(file_path.replace(".csv", "_filtered.csv"), index=False)
+
+
+  def __len__(self):
+    self._length = len(self.img_list)
+    print(f"Length of dataset: {self._length}")
+    return self._length 
+   
+  def __getitem__(self, index):
+
+    imagePath = self.img_list[index]
+
+    imageData = Image.open(imagePath).convert('RGB')
+    imageLabel = torch.FloatTensor(self.img_label[index])
+
+    if self.transform != None: imageData = self.augment(imageData)
+
+    return imageData, imageLabel
+
+
 class ChestXray14Dataset_general(Dataset):
 
   def __init__(self, images_path, file_path, augment, possible_labels, annotaion_percent=100, annotation_file="Data_Entry_2017_v2020.csv"):
