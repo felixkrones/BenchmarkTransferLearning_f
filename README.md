@@ -13,10 +13,11 @@ It mainly extends the original repository in the following five ways:
 - Added evaluation pipeline: `pipeline_eval.ipynb`
 
 ### Getting started
-You can just use the repository as decribed in the original README below.
-Jost prepare the resnet moco checkpoints first using `prep_moco.py` (provide the paths in the file, dont do it for vit).
-This runs the code from `download_and_prepare_models.py` on already downloaded moco files.
-You need to use deit-converted checkpoints (see moco-v3 docu).
+- You can just use the repository as decribed in the original README below.
+- For Moco-v2 pre-training, use [Moco-v3 extension](https://github.com/felixkrones/moco-v3_f)
+  - You need to use deit-converted checkpoints (see moco-v3 docu).
+  - Jost prepare the resnet moco checkpoints first using `prep_moco.py` (provide the paths in the file, dont do it for vit).
+  - This runs the code from `download_and_prepare_models.py` on already downloaded moco files.
 
 ### Getting the additional data
 - General tips

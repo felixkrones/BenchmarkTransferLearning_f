@@ -45,7 +45,7 @@ def get_args_parser():
     parser.add_option("--epochs", dest="num_epoch", help="num of epoches", default=20, type="int")
     # Optimizer parameters
     parser.add_option("--optimizer", dest="optimizer", help="Adam | SGD", default="Adam", type="string")
-    parser.add_option('--opt', default='momentum', type=str, metavar='OPTIMIZER',
+    parser.add_option('--opt', default='adamw', type=str, metavar='OPTIMIZER',
                         help='Optimizer (default: "adamw"')
     parser.add_option('--opt-eps', default=1e-8, type=float, metavar='EPSILON',
                         help='Optimizer Epsilon (default: 1e-8)')
@@ -62,7 +62,7 @@ def get_args_parser():
     # Learning rate schedule parameters
     parser.add_option('--sched', default='cosine', type=str, metavar='SCHEDULER',
                         help='LR scheduler (default: "cosine"')
-    parser.add_option("--lr", dest="lr", help="learning rate", default=1e-4, type="float")
+    parser.add_option("--lr", dest="lr", help="learning rate", default=1e-5, type="float")
     parser.add_option("--lr_Scheduler", dest="lr_Scheduler", help="learning schedule", default="ReduceLROnPlateau",
                       type="string")
     parser.add_option('--lr-noise', type=float, nargs='+', default=None, metavar='pct, pct',
@@ -130,15 +130,16 @@ def main(args):
     args.exp_name = args.model_name + "_" + args.init
     model_path = os.path.join("./models/Classification",args.data_set)
     output_path = os.path.join("./Outputs/Classification",args.data_set)
-    diseases = ["Atelectasis", "Cardiomegaly", "Consolidation", "Edema", "Pneumonia", "Pneumothorax", 'No Finding']
+    test_diseases_name = ["Atelectasis", "Cardiomegaly", "Consolidation", "Edema", "Pneumonia", "Pneumothorax", 'No Finding']
 
     if args.data_set == "ChestXray14":
         diseases = ['Atelectasis', 'Cardiomegaly', 'Effusion', 'Infiltration', 'Mass', 'Nodule',
                     'Pneumonia', 'Pneumothorax', 'Consolidation', 'Edema',
                     'Emphysema', 'Fibrosis', 'Pleural_Thickening', 'Hernia']
-        #dataset_train = ChestXray14Dataset_general(images_path=args.data_dir, file_path=args.train_list,augment=build_transform_classification(normalize=args.normalization, mode="train"), possible_labels=diseases)
-        #dataset_val = ChestXray14Dataset_general(images_path=args.data_dir, file_path=args.val_list,augment=build_transform_classification(normalize=args.normalization, mode="valid"), possible_labels=diseases)
-        #dataset_test = ChestXray14Dataset_general(images_path=args.data_dir, file_path=args.test_list,augment=build_transform_classification(normalize=args.normalization, mode="test", test_augment=args.test_augment), possible_labels=diseases)
+        #test_diseases = [diseases.index(c) for c in test_diseases_name]
+        #dataset_train = ChestXray14Dataset_general(images_path=args.data_dir, file_path=args.train_list,augment=build_transform_classification(normalize=args.normalization, mode="train"), possible_labels=test_diseases_name)
+        #dataset_val = ChestXray14Dataset_general(images_path=args.data_dir, file_path=args.val_list,augment=build_transform_classification(normalize=args.normalization, mode="valid"), possible_labels=test_diseases_name)
+        #dataset_test = ChestXray14Dataset_general(images_path=args.data_dir, file_path=args.test_list,augment=build_transform_classification(normalize=args.normalization, mode="test", test_augment=args.test_augment), possible_labels=test_diseases_name)
         dataset_train = ChestXray14Dataset(images_path=args.data_dir, file_path=args.train_list,augment=build_transform_classification(normalize=args.normalization, mode="train"))
         dataset_val = ChestXray14Dataset(images_path=args.data_dir, file_path=args.val_list,augment=build_transform_classification(normalize=args.normalization, mode="valid"))
         dataset_test = ChestXray14Dataset(images_path=args.data_dir, file_path=args.test_list,augment=build_transform_classification(normalize=args.normalization, mode="test", test_augment=args.test_augment))
@@ -150,7 +151,7 @@ def main(args):
         diseases = ['No Finding', 'Enlarged Cardiomediastinum', 'Cardiomegaly', 'Lung Opacity',
                            'Lung Lesion', 'Edema', 'Consolidation', 'Pneumonia', 'Atelectasis', 'Pneumothorax',
                            'Pleural Effusion', 'Pleural Other', 'Fracture', 'Support Devices']
-        test_diseases_name = ['Atelectasis', 'Cardiomegaly', 'Consolidation', 'Edema', 'Pleural Effusion']
+        #test_diseases_name = ['Atelectasis', 'Cardiomegaly', 'Consolidation', 'Edema', 'Pleural Effusion']
         test_diseases = [diseases.index(c) for c in test_diseases_name]
         dataset_train = CheXpertDataset(images_path=args.data_dir, file_path=args.train_list,
                                         augment=build_transform_classification(normalize=args.normalization, mode="train", nc=args.nc), uncertain_label=args.uncertain_label, unknown_label=args.unknown_label, annotation_percent=args.anno_percent, num_class=len(diseases), nc=args.nc)
@@ -179,11 +180,28 @@ def main(args):
 
 
     elif args.data_set == "padchest":
-        dataset_train = PadchestDataset(images_path=args.data_dir, file_path=args.train_list, augment=build_transform_classification(normalize=args.normalization, mode="train"))
-        dataset_val = PadchestDataset(images_path=args.data_dir, file_path=args.val_list, augment=build_transform_classification(normalize=args.normalization, mode="valid"))
-        dataset_test = PadchestDataset(images_path=args.data_dir, file_path=args.test_list, augment=build_transform_classification(normalize=args.normalization, mode="test", test_augment=args.test_augment))
+        dataset_train = PadchestDataset(images_path=args.data_dir, file_path=args.train_list, augment=build_transform_classification(normalize=args.normalization, mode="train"), possible_labels=test_diseases_name)
+        dataset_val = PadchestDataset(images_path=args.data_dir, file_path=args.val_list, augment=build_transform_classification(normalize=args.normalization, mode="valid"), possible_labels=test_diseases_name)
+        dataset_test = PadchestDataset(images_path=args.data_dir, file_path=args.test_list, augment=build_transform_classification(normalize=args.normalization, mode="test", test_augment=args.test_augment), possible_labels=test_diseases_name)
 
-        classification_engine(args, model_path, output_path, diseases, dataset_train, dataset_val, dataset_test)
+        classification_engine(args, model_path, output_path, test_diseases_name, dataset_train, dataset_val, dataset_test)
+
+    elif args.data_set == "MIMIC":
+        dataset_train = MIMIC_Dataset(images_path=args.data_dir, file_path=args.train_list, augment=build_transform_classification(normalize=args.normalization, mode="train"), n_samples=100000)
+        dataset_val = MIMIC_Dataset(images_path=args.data_dir, file_path=args.val_list, augment=build_transform_classification(normalize=args.normalization, mode="valid"), n_samples=5000)
+        dataset_test = MIMIC_Dataset(images_path=args.data_dir, file_path=args.test_list, augment=build_transform_classification(normalize=args.normalization, mode="test", test_augment=args.test_augment), n_samples=5000)
+        
+        classification_engine(args, model_path, output_path, None, dataset_train, dataset_val, dataset_test)
+
+    elif args.data_set == "ImageNet":
+        dataset_train = ImageNet_Dataset(images_path=args.data_dir, file_path=args.train_list, augment=build_transform_classification(normalize=args.normalization, mode="train"))
+        dataset_val = ImageNet_Dataset(images_path=args.data_dir, file_path=args.val_list, augment=build_transform_classification(normalize=args.normalization, mode="valid"))
+        dataset_test = ImageNet_Dataset(images_path=args.data_dir, file_path=args.test_list, augment=build_transform_classification(normalize=args.normalization, mode="test", test_augment=args.test_augment))
+        
+        classification_engine(args, model_path, output_path, None, dataset_train, dataset_val, dataset_test)
+
+    else:
+        raise NotImplementedError(f"Dataset {args.data_set} not implemented.")
 
 
 if __name__ == '__main__':

@@ -142,6 +142,78 @@ class PadchestDataset(Dataset):
     if self.transform != None: imageData = self.augment(imageData)
 
     return imageData, imageLabel
+  
+
+class ImageNet_Dataset(Dataset):
+  pass
+
+class MIMIC_Dataset(Dataset):
+
+  def __init__(self, images_path, file_path, augment, possible_labels=None, n_samples=1000, annotation_file="mimic-cxr-2.0.0-chexpert.csv"):
+    
+    self.img_list = []
+    self.img_label = []
+    self.augment = augment
+    self.datapath = os.path.join(images_path, 'physionet.org', 'files', 'mimic-cxr-jpg', '2.0.0')
+    self._annotation_file = pd.read_csv(pathlib.Path(self.datapath) / annotation_file)
+    self._labels = [c for c in self._annotation_file.columns if c not in ["subject_id", "study_id", "dicom_id", "split", "view", "img_path"]]
+    self.metadata = pd.read_csv(file_path)
+    self.possible_labels = possible_labels
+    self.n_samples = n_samples
+
+    # Create paths to images
+    self.metadata = pd.read_csv(os.path.join(self.datapath, 'mimic-cxr-2.0.0-metadata.csv'))
+    self.metadata["subject_category"] = self.metadata["subject_id"].apply(lambda x: int(str(x)[:2]))
+    self.metadata["img_path"] = self.metadata[["subject_category", "subject_id", "study_id", "dicom_id"]].apply(lambda x: os.path.join(self.datapath, "files",  f"p{x[0]}/p{x[1]}/s{x[2]}/{x[3]}.jpg"), axis=1)
+    
+    # Filter data to only include images from the possible patient ids
+    #self.metadata = self.metadata[self.metadata["subject_category"].isin(possible_patient_ids)]
+
+    # Filter data to only include images with a view position of PA or AP
+    self.metadata = self.metadata[self.metadata["ViewPosition"].isin(["PA", "AP"])]
+
+    # Merge columns from self._annotation_file left to self.metadata, based on columns subject_id and study_id and check if number of rows is the same
+    old_shape = len(self.metadata)
+    self.metadata = pd.merge(self.metadata, self._annotation_file, how="left", on=["subject_id", "study_id"])
+    assert len(self.metadata) == old_shape, "Number of rows in self.metadata changed, prob. because the label file contained duplicates."
+
+    # Remove observations where no column from self._labels has any of the values -1, 0, 1
+    old_shape = len(self.metadata)
+    self.metadata = self.metadata[self.metadata[self._labels].isin([-1, 0, 1]).any(axis=1)]
+    print(f"Removed {old_shape - len(self.metadata)} observations where no column from self._labels had any of the values -1, 0, 1.")
+
+    # Randomly sample n_samples images
+    if self.n_samples is None:
+        self.n_samples = len(self.metadata)
+    if self.n_samples <= len(self.metadata):
+        self.metadata = self.metadata.sample(n=self.n_samples, random_state=42)
+    else:
+        raise ValueError(f"n_samples must be less than or equal to the number of images in the dataset, which is {len(self.metadata)}")
+
+    # Get labels
+    if self.possible_labels is None:
+      self.possible_labels = self._labels
+
+    self.img_list = []
+    self.img_label = []
+
+    for index, row in self.metadata.iterrows():
+      self.img_list.append(row["img_path"])
+      self.img_label.append([1 if row[label] == 1 else 0 for label in self.possible_labels])
+
+  def __len__(self):
+    return len(self.img_list)
+
+  def __getitem__(self, index):
+
+    imagePath = self.img_list[index]
+
+    imageData = Image.open(imagePath).convert('RGB')
+    imageLabel = torch.FloatTensor(self.img_label[index])
+
+    if self.augment != None: imageData = self.augment(imageData)
+
+    return imageData, imageLabel
 
 
 class ChestXray14Dataset_general(Dataset):

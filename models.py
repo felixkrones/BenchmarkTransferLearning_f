@@ -11,8 +11,10 @@ import torchvision.models as models
 import resnet_wider
 import densenet
 import simmim
+from vits import VisionTransformerMoCo
 from gmml.model_utils import get_prepared_checkpoint, LabelTokenViT
 import gmml.data_transformations
+
 
 def build_classification_model(args):
     if "vit" in args.model_name.lower():
@@ -98,9 +100,14 @@ def build_classification_model(args):
                     load_proxy_dir(model, args.init.lower(), args.proxy_dir)
                 
             elif args.model_name.lower() == "vit_small":
-                model = VisionTransformer(in_chans=args.nc, num_classes=args.num_class,
-                        patch_size=16, embed_dim=384, depth=12, num_heads=6, mlp_ratio=4, qkv_bias=True,
-                        norm_layer=partial(nn.LayerNorm, eps=1e-6))
+                if "moco" in args.init.lower():
+                    model = VisionTransformerMoCo(in_chans=args.nc, num_classes=args.num_class,
+                            patch_size=16, embed_dim=384, depth=12, num_heads=12, mlp_ratio=4, qkv_bias=True,
+                            norm_layer=partial(nn.LayerNorm, eps=1e-6))
+                else:
+                    model = VisionTransformer(in_chans=args.nc, num_classes=args.num_class,
+                            patch_size=16, embed_dim=384, depth=12, num_heads=6, mlp_ratio=4, qkv_bias=True,
+                            norm_layer=partial(nn.LayerNorm, eps=1e-6))
                 model.default_cfg = _cfg()
                 model = load_proxy_dir(model, args.init.lower(), args.proxy_dir) 
                 
@@ -201,10 +208,7 @@ def ClassificationNet(arch_name, num_class, args, conv=None, weight=None, activa
             print("=> loaded supervised ImageNet pre-trained model")
         elif os.path.isfile(weight):
             checkpoint = torch.load(weight, map_location="cpu")
-            if "state_dict" in checkpoint:
-                state_dict = checkpoint["state_dict"]
-            else:
-                state_dict = checkpoint
+            state_dict = checkpoint["state_dict"]
 
             state_dict = {k.replace("module.", ""): v for k, v in state_dict.items()}
             state_dict = {k.replace("module.encoder_q.", ""): v for k, v in state_dict.items()}
@@ -258,8 +262,8 @@ def load_proxy_dir(model, init, proxy_dir):
         state_dict = {k.replace("module.", ""): v for k, v in state_dict.items()}
         # remove `backbone.` prefix induced by multicrop wrapper
         state_dict = {k.replace("backbone.", ""): v for k, v in state_dict.items()}
-    elif init =="moco_v3":
-        state_dict = checkpoint
+    elif "moco" in init:
+        state_dict = checkpoint["state_dict"]
         for k in list(state_dict.keys()):
             # retain only base_encoder up to before the embedding layer
             if k.startswith('module.base_encoder') and not k.startswith('module.base_encoder.head'):
@@ -276,7 +280,7 @@ def load_proxy_dir(model, init, proxy_dir):
         state_dict = get_prepared_checkpoint(model, proxy_dir)   
     else:
         print("Trying to load the checkpoint for {} at {}, but we cannot guarantee the success.".format(init, proxy_dir))
-        
+        state_dict = checkpoint["state_dict"]
     msg = model.load_state_dict(state_dict, strict=False)
     print('Loaded with msg: {}'.format(msg))
     return model
