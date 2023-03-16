@@ -68,3 +68,4 @@ STD over All test trials:  = 0.0000
 All trials: all mAUC  = [0.9773	0.9773	0.9773	0.9773]
 Mean AUC over All all trials = 0.9773
 STD over All all trials:  = 0.0000
+Disease = None

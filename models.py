@@ -208,7 +208,10 @@ def ClassificationNet(arch_name, num_class, args, conv=None, weight=None, activa
             print("=> loaded supervised ImageNet pre-trained model")
         elif os.path.isfile(weight):
             checkpoint = torch.load(weight, map_location="cpu")
-            state_dict = checkpoint["state_dict"]
+            if "moco" in args.init.lower():
+                state_dict = checkpoint
+            else:
+                state_dict = checkpoint["state_dict"]
 
             state_dict = {k.replace("module.", ""): v for k, v in state_dict.items()}
             state_dict = {k.replace("module.encoder_q.", ""): v for k, v in state_dict.items()}
