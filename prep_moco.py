@@ -11,7 +11,7 @@ from torchvision import models
 from download_and_prepare_models import LoadedResNet
 
 MODELS = [
-    '/home/ubuntu/models/moco-v3_r50_300e_imagenet_deit.pth'
+    '/home/ubuntu/models/moco/mimic/r50/moco-v3_r50_100e_mimic_after_imagenet_deit.pth'
 ]
 
 if __name__ == '__main__':

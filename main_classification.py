@@ -97,7 +97,7 @@ def get_args_parser():
                       callback=vararg_callback_bool)
     parser.add_option("--best", dest="best", help="whether to use last or best checkpoint", default="last", action="callback",
                       callback=vararg_callback_bool)
-    parser.add_option("--workers", dest="workers", help="number of CPU workers", default=8, type="int")
+    parser.add_option("--workers", dest="workers", help="number of CPU workers", default=4, type="int")
     parser.add_option("--print_freq", dest="print_freq", help="print frequency", default=50, type="int")
     parser.add_option("--test_augment", dest="test_augment", help="whether use test time augmentation",
                       default=False, action="callback", callback=vararg_callback_bool)
@@ -127,10 +127,13 @@ def main(args):
     if args.init.lower() != 'imagenet' and args.init.lower() != 'random':
         assert args.proxy_dir is not None
 
-    args.exp_name = args.model_name + "_" + args.init
+    if args.proxy_dir is not None:
+        args.exp_name = args.proxy_dir.split("/")[-1].split(".")[0]
+    else:
+        args.exp_name = args.model_name + "_" + args.init
     model_path = os.path.join("./models/Classification",args.data_set)
     output_path = os.path.join("./Outputs/Classification",args.data_set)
-    test_diseases_name = ["Atelectasis", "Cardiomegaly", "Consolidation", "Edema", "Pneumonia", "Pneumothorax", 'No Finding']
+    test_diseases_name = ["Atelectasis", "Cardiomegaly", "Consolidation", "Edema", "Pneumonia", "Pneumothorax"]
 
     if args.data_set == "ChestXray14":
         diseases = ['Atelectasis', 'Cardiomegaly', 'Effusion', 'Infiltration', 'Mass', 'Nodule',

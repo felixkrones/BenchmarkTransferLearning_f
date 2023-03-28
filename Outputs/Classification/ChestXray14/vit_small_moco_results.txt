@@ -11,3 +11,4 @@ STD over All test trials:  = 0.0000
 All trials: all mAUC  = [0.5968]
 Mean AUC over All all trials = 0.5968
 STD over All all trials:  = 0.0000
+Disease = ['Atelectasis', 'Cardiomegaly', 'Effusion', 'Infiltration', 'Mass', 'Nodule', 'Pneumonia', 'Pneumothorax', 'Consolidation', 'Edema', 'Emphysema', 'Fibrosis', 'Pleural_Thickening', 'Hernia']
