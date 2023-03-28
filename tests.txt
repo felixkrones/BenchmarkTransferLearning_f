@@ -71,7 +71,7 @@ python main_classification.py --data_set ChestXray14 \
 --mode train \
 --resume True \
 --init moco \
---proxy_dir /home/ubuntu/models/moco/imagenet/vit_small/vit-s_300ep.pth.tar \
+--proxy_dir /home/ubuntu/models/moco/imagenet/vit_small/moco-v3_vits_300e_imagenet_deit.pth \
 --train_list dataset/Xray14_train_official.txt \
 --val_list dataset/Xray14_val_official.txt \
 --test_list dataset/Xray14_test_official.txt \

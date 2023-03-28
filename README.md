@@ -31,9 +31,7 @@ It mainly extends the original repository in the following five ways:
 - NIH ChestXray 14:
   - Download data from [box](https://nihcc.app.box.com/v/ChestXray-NIHCC)
   - Download the `images/` folder (there is a nice Python script provided)
-  - Download the metadata file `Data_Entry_2017_v2020.csv`
-  - Download the split files `https://nihcc.app.box.com/v/ChestXray-NIHCC/file/256056636701` and `https://nihcc.app.box.com/v/ChestXray-NIHCC/file/256055473534`
-  - Or download the split files from [Seyyed et al.](https://github.com/LalehSeyyed/Underdiagnosis_NatMed/tree/main/NIH/Splits)
+  - Download the metadata file `Data_Entry_2017_v2020.csv` into the same folder where the `images/` folder will be
 - ChestXpert
     1. Download data from [CheXpert dataset](https://stanfordmlgroup.github.io/competitions/chexpert/)
         - Either by directly downloading the zip file 

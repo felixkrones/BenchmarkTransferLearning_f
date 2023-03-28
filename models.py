@@ -266,20 +266,19 @@ def load_proxy_dir(model, init, proxy_dir):
         # remove `backbone.` prefix induced by multicrop wrapper
         state_dict = {k.replace("backbone.", ""): v for k, v in state_dict.items()}
     elif "moco" in init:
-        print(checkpoint.keys())
         if "state_dict" in checkpoint:
             state_dict = checkpoint["state_dict"]
+            for k in list(state_dict.keys()):
+                # retain only base_encoder up to before the embedding layer
+                if k.startswith('module.base_encoder') and not k.startswith('module.base_encoder.head'):
+                    # remove prefix
+                    state_dict[k[len("module.base_encoder."):]] = state_dict[k]
+                # delete renamed or unused k
+                del state_dict[k]
         elif "model" in checkpoint:
             state_dict = checkpoint["model"]
         else:
             raise ValueError("No state_dict or model in checkpoint")
-        for k in list(state_dict.keys()):
-            # retain only base_encoder up to before the embedding layer
-            if k.startswith('module.base_encoder') and not k.startswith('module.base_encoder.head'):
-                # remove prefix
-                state_dict[k[len("module.base_encoder."):]] = state_dict[k]
-            # delete renamed or unused k
-            del state_dict[k]
     elif init == "moby":
         state_dict = checkpoint['model']
         state_dict = {k.replace('encoder.', ''): v for k, v in state_dict.items() if 'encoder.' in k}
