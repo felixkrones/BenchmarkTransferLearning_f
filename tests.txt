@@ -10,6 +10,21 @@ python convert_to_deit.py \
 ################################################################################
 # Fine-tuning benchmark
 ################################################################################
+0.3	vit_small	na	Supervised	ImageNet1k
+python main_classification.py --data_set ChestXray14 \
+--data_dir /home/ubuntu/data/NIHChest14/images/ \
+--model vit_small \
+--mode train \
+--resume True \
+--init imagenet \
+--train_list dataset/Xray14_train_official.txt \
+--val_list dataset/Xray14_val_official.txt \
+--test_list dataset/Xray14_test_official.txt \
+--device cuda \
+--epochs 20 \
+--batch_size 64
+
+
 0.6	    ViT_small	GMML	    Self-supervised 		NIH (200e)
 python main_classification.py --data_set ChestXray14 \
 --data_dir /home/ubuntu/data/NIHChest14/images/ \
@@ -71,7 +86,7 @@ python main_classification.py --data_set ChestXray14 \
 --mode train \
 --resume True \
 --init moco \
---proxy_dir /home/ubuntu/models/moco/imagenet/vit_small/moco-v3_vits_300e_imagenet_deit.pth \
+--proxy_dir /home/ubuntu/models/moco/imagenet/vit_small/vit-s_300ep.pth.tar \
 --train_list dataset/Xray14_train_official.txt \
 --val_list dataset/Xray14_val_official.txt \
 --test_list dataset/Xray14_test_official.txt \
@@ -102,16 +117,16 @@ python main_classification.py --data_set ChestXray14 \
 ################################################################################
 12.2	ViT_small	SiT	    Self-supervised 	ImageNet1k
 python main_classification.py --data_set ChestXray14 \
---data_dir /home/ubuntu/data/NIHChest14/images/ \
+--data_dir /Users/felixkrones/python_projects/data/NIHChest14/images/ \
 --model vit_small \
 --mode train \
 --resume True \
 --init sit \
---proxy_dir /home/ubuntu/models/SiT_Small_ImageNet.pth \
+--proxy_dir /Users/felixkrones/python_projects/models/SiT_Small_ImageNet.pth \
 --train_list dataset/Xray14_train_official.txt \
 --val_list dataset/Xray14_val_official.txt \
 --test_list dataset/Xray14_test_official.txt \
---device cuda \
+--device mps \
 --epochs 20 \
 --batch_size 64
 
@@ -123,10 +138,10 @@ python main_classification.py --data_set ChestXray14 \
 --mode train \
 --resume True \
 --init sit \
---proxy_dir /home/ubuntu/models/SiT/mimic/sit_vit_small_100e_mimic_after_imagenet.pth \
+--proxy_dir /Users/felixkrones/python_projects/models/sit_vit_small_100e_mimic_after_imagenet.pth \
 --train_list dataset/Xray14_train_official.txt \
 --val_list dataset/Xray14_val_official.txt \
 --test_list dataset/Xray14_test_official.txt \
---device cuda \
+--device mps \
 --epochs 20 \
 --batch_size 64

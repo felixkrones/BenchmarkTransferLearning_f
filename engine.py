@@ -293,7 +293,7 @@ def segmentation_engine(args, model_path, dataset_train, dataset_val, dataset_te
           break
 
         log_writter.flush()
-  torch.cuda.empty_cache()
+  eval(f"torch.{args.device}.empty_cache()")
 
   data_loader_test = torch.utils.data.DataLoader(dataset_test, batch_size=args.test_batch_size, shuffle=False,
                                                 num_workers=args.test_num_workers)
