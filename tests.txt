@@ -10,37 +10,37 @@ python convert_to_deit.py \
 ################################################################################
 # Fine-tuning benchmark
 ################################################################################
-0.3	vit_small	na	Supervised	ImageNet1k
+7	    ViT_small	GMML	    Self-supervised 		NIH (1000e)
 python main_classification.py --data_set ChestXray14 \
---data_dir /home/ubuntu/data/NIHChest14/images/ \
---model vit_small \
---mode train \
---resume True \
---init imagenet \
---train_list dataset/Xray14_train_official.txt \
---val_list dataset/Xray14_val_official.txt \
---test_list dataset/Xray14_test_official.txt \
---device cuda \
---epochs 20 \
---batch_size 64
-
-
-0.6	    ViT_small	GMML	    Self-supervised 		NIH (200e)
-python main_classification.py --data_set ChestXray14 \
---data_dir /home/ubuntu/data/NIHChest14/images/ \
+--data_dir /Users/felixkrones/python_projects/data/NIHChest14/images/ \
 --model vit_small \
 --mode train \
 --resume True \
 --init gmml \
---proxy_dir /home/ubuntu/models/gmml/nih/gmml_1000e_nih.pth \
+--proxy_dir /Users/felixkrones/python_projects/models/gmml_checkpoint_1000_NIH.pth \
 --train_list dataset/Xray14_train_official.txt \
 --val_list dataset/Xray14_val_official.txt \
 --test_list dataset/Xray14_test_official.txt \
---device cuda \
---epochs 21 \
+--device mps \
+--epochs 20 \
 --batch_size 64
 
-0.7	    ViT_small	SiT	    Self-supervised 		NIH (200e)
+python main_classification.py --data_set ChestXray14 \
+--data_dir /Users/felixkrones/python_projects/data/NIHChest14/images/ \
+--model vit_small \
+--mode train \
+--resume True \
+--init gmml \
+--proxy_dir /Users/felixkrones/python_projects/models/gmml_vits_NIH120e.pth \
+--train_list dataset/Xray14_train_official.txt \
+--val_list dataset/Xray14_val_official.txt \
+--test_list dataset/Xray14_test_official.txt \
+--device mps \
+--epochs 20 \
+--batch_size 64
+
+
+8	    ViT_small	SiT	    Self-supervised 		NIH (200e)
 python main_classification.py --data_set ChestXray14 \
 --data_dir /home/ubuntu/data/NIHChest14/images/ \
 --model vit_small \
@@ -56,10 +56,66 @@ python main_classification.py --data_set ChestXray14 \
 --batch_size 64
 
 
+
+
+################################################################################
+# Fine-tuning experiments random
+################################################################################
+0.1	ResNet50	supervised	Random
+python main_classification.py --data_set ChestXray14 \
+--data_dir /Users/felixkrones/python_projects/data/NIHChest14/images/ \
+--model ResNet50 \
+--mode train \
+--resume True \
+--init random \
+--train_list dataset/Xray14_train_official.txt \
+--val_list dataset/Xray14_val_official.txt \
+--test_list dataset/Xray14_test_official.txt \
+--device mps \
+--epochs 20 \
+--batch_size 64
+
+0.2	vit_small	supervised	Random
+python main_classification.py --data_set ChestXray14 \
+--data_dir /home/ubuntu/data/NIHChest14/images/ \
+--model vit_small \
+--mode train \
+--resume True \
+--init random \
+--train_list dataset/Xray14_train_official.txt \
+--val_list dataset/Xray14_val_official.txt \
+--test_list dataset/Xray14_test_official.txt \
+--device cuda \
+--epochs 20 \
+--batch_size 64
+
+
+
+
+################################################################################
+# Fine-tuning experiments supervised
+################################################################################
+1.2	ResNet50	Supervised	ImageNet1k	COCO pre-training
+python main_classification.py --data_set COCO \
+--data_dir /Users/felixkrones/python_projects/data/COCO/unlabeled2017/ \
+--model ResNet50 \
+--mode train \
+--resume True \
+--init imagenet \
+--train_list dataset/Xray14_train_official.txt \
+--val_list dataset/Xray14_val_official.txt \
+--test_list dataset/Xray14_test_official.txt \
+--device mps \
+--epochs 100 \
+--batch_size 64
+
+
+
+
 ################################################################################
 # Fine-tuning experiments resnet50 moco
 ################################################################################
-8	ResNet50	MocoV3	Self-supervised 	ImageNet1k	X-ray, chest (MIMIC)
+3.2 ResNet50	MocoV3	Self-supervised 	ImageNet1k	X-ray, chest (MIMIC)
 python main_classification.py --data_set ChestXray14 \
 --data_dir /home/ubuntu/data/NIHChest14/images/ \
 --model ResNet50 \
@@ -81,16 +137,16 @@ python main_classification.py --data_set ChestXray14 \
 ################################################################################
 12.1	ViT_small	MocoV3	Self-supervised 	ImageNet1k
 python main_classification.py --data_set ChestXray14 \
---data_dir /home/ubuntu/data/NIHChest14/images/ \
+--data_dir /Users/felixkrones/python_projects/data/NIHChest14/images/ \
 --model vit_small \
 --mode train \
 --resume True \
 --init moco \
---proxy_dir /home/ubuntu/models/moco/imagenet/vit_small/vit-s_300ep.pth.tar \
+--proxy_dir /Users/felixkrones/python_projects/models/vit-s-300ep.pth.tar \
 --train_list dataset/Xray14_train_official.txt \
 --val_list dataset/Xray14_val_official.txt \
 --test_list dataset/Xray14_test_official.txt \
---device cuda \
+--device mps \
 --epochs 20 \
 --batch_size 64
 
@@ -115,7 +171,7 @@ python main_classification.py --data_set ChestXray14 \
 ################################################################################
 # Fine-tuning experiments vit_small sit
 ################################################################################
-12.2	ViT_small	SiT	    Self-supervised 	ImageNet1k
+4.1	ViT_small	SiT	    Self-supervised 	ImageNet1k
 python main_classification.py --data_set ChestXray14 \
 --data_dir /Users/felixkrones/python_projects/data/NIHChest14/images/ \
 --model vit_small \
@@ -131,14 +187,14 @@ python main_classification.py --data_set ChestXray14 \
 --batch_size 64
 
 
-12.4	ViT_small	SiT	    Self-supervised 	ImageNet1k	X-ray, chest (MIMIC)
+4.2	ViT_small	SiT	ImageNet1k	X-ray, chest (MIMIC)
 python main_classification.py --data_set ChestXray14 \
---data_dir /home/ubuntu/data/NIHChest14/images/ \
+--data_dir /Users/felixkrones/python_projects/data/NIHChest14/images/ \
 --model vit_small \
 --mode train \
 --resume True \
 --init sit \
---proxy_dir /Users/felixkrones/python_projects/models/sit_vit_small_100e_mimic_after_imagenet.pth \
+--proxy_dir /Users/felixkrones/python_projects/models/sit_vit_small_mimic_50e_after_imagenet.pth \
 --train_list dataset/Xray14_train_official.txt \
 --val_list dataset/Xray14_val_official.txt \
 --test_list dataset/Xray14_test_official.txt \

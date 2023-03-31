@@ -3,6 +3,7 @@ import torch
 import random
 import copy
 import csv
+import json
 import pandas as pd
 import pathlib
 from PIL import Image
@@ -144,8 +145,44 @@ class PadchestDataset(Dataset):
     return imageData, imageLabel
   
 
-class ImageNet_Dataset(Dataset):
-  pass
+class COCO(Dataset):
+  def __init__(self, images_path, file_path, augment, nc=3, n_samples=None):
+     
+    self.img_list = []
+    self.img_label = []
+    self.augment = augment
+    self.nc = nc
+    self.n_samples = n_samples
+
+    self._json = json.load(open(file_path, 'r'))
+    df_images = pd.DataFrame(self._json['images'])
+    df_annotations = pd.DataFrame(self._json['annotations'])
+    self.df_images_annotations = pd.merge(df_images, df_annotations, how="left", left_on="id", right_on="image_id", suffixes=("_image", "_annotation"))
+
+    if self.n_samples is None:
+        self.n_samples = len(self.df_images_annotations)
+    if self.n_samples < len(self.df_images_annotations):
+        self.df_images_annotations = self.df_images_annotations.sample(n=self.n_samples, random_state=42)
+    else:
+        raise ValueError(f"n_samples must be less than or equal to the number of images in the dataset, which is {len(self.metadata)}")
+
+    self.img_list = list(self.df_images_annotations["file_name"].apply(lambda x: os.path.join(images_path, x)))
+    self.img_label = list(self.df_images_annotations["category_id"].values)
+
+  def __len__(self):
+    return len(self.img_list)
+
+  def __getitem__(self, index):
+
+    imagePath = self.img_list[index]
+
+    imageData = Image.open(imagePath).convert('RGB')
+    imageLabel = torch.FloatTensor(self.img_label[index])
+
+    if self.augment != None: imageData = self.augment(imageData)
+
+    return imageData, imageLabel
+
 
 class MIMIC_Dataset(Dataset):
 
@@ -185,7 +222,7 @@ class MIMIC_Dataset(Dataset):
     # Randomly sample n_samples images
     if self.n_samples is None:
         self.n_samples = len(self.metadata)
-    if self.n_samples <= len(self.metadata):
+    if self.n_samples < len(self.metadata):
         self.metadata = self.metadata.sample(n=self.n_samples, random_state=42)
     else:
         raise ValueError(f"n_samples must be less than or equal to the number of images in the dataset, which is {len(self.metadata)}")

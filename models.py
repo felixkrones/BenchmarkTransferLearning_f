@@ -100,24 +100,21 @@ def build_classification_model(args):
                     load_proxy_dir(model, args.init.lower(), args.proxy_dir)
                 
             elif args.model_name.lower() == "vit_small":
+                num_heads = 6
                 if "moco" in args.init.lower():
-                    model = VisionTransformerMoCo(in_chans=args.nc, num_classes=args.num_class,
-                            patch_size=16, embed_dim=384, depth=12, num_heads=12, mlp_ratio=4, qkv_bias=True,
-                            norm_layer=partial(nn.LayerNorm, eps=1e-6))
-                else:
-                    model = VisionTransformer(in_chans=args.nc, num_classes=args.num_class,
-                            patch_size=16, embed_dim=384, depth=12, num_heads=6, mlp_ratio=4, qkv_bias=True,
-                            norm_layer=partial(nn.LayerNorm, eps=1e-6))
+                    num_heads = 6
+                model = VisionTransformer(in_chans=args.nc, num_classes=args.num_class,
+                        patch_size=16, embed_dim=384, depth=12, num_heads=num_heads, mlp_ratio=4, qkv_bias=True,
+                        norm_layer=partial(nn.LayerNorm, eps=1e-6))
                 model.default_cfg = _cfg()
-                model = load_proxy_dir(model, args.init.lower(), args.proxy_dir) 
+                load_proxy_dir(model, args.init.lower(), args.proxy_dir) 
                 
             elif args.model_name.lower() == "swin_base":
                 if args.init.lower() == "simmim":
                     model = simmim.create_model(args)
                 elif args.init.lower() =="imagenet_1k" or args.init.lower() =="imagenet":
                     model = timm.create_model('swin_base_patch4_window7_224', num_classes=args.num_class, checkpoint_path=args.proxy_dir)
-
-                    
+    
             elif args.model_name.lower() == "swin_tiny": 
                 model = timm.create_model('swin_tiny_patch4_window7_224', num_classes=args.num_class)
                 load_proxy_dir(model, args.init.lower(), args.proxy_dir)

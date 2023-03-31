@@ -1,0 +1,13 @@
+Disease = ['Atelectasis', 'Cardiomegaly', 'Effusion', 'Infiltration', 'Mass', 'Nodule', 'Pneumonia', 'Pneumothorax', 'Consolidation', 'Edema', 'Emphysema', 'Fibrosis', 'Pleural_Thickening', 'Hernia']
+sit_vit_small_100e_mimic_after_imagenet_run_0: AUC test = [0.7138	0.6998	0.7721	0.6788	0.6654	0.6372	0.6337	0.7709	0.7004	0.8175
+ 0.7112	0.7178	0.6943	0.5327]
+sit_vit_small_100e_mimic_after_imagenet_run_0: AUC all = [0.7138	0.6998	0.7721	0.6788	0.6654	0.6372	0.6337	0.7709	0.7004	0.8175
+ 0.7112	0.7178	0.6943	0.5327]
+sit_vit_small_100e_mimic_after_imagenet_run_0: AUC test = 0.6961
+sit_vit_small_100e_mimic_after_imagenet_run_0: AUC all = 0.6961
+All trials: test mAUC  = [0.6961]
+Mean AUC over All test trials = 0.6961
+STD over All test trials:  = 0.0000
+All trials: all mAUC  = [0.6961]
+Mean AUC over All all trials = 0.6961
+STD over All all trials:  = 0.0000

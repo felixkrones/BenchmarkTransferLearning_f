@@ -196,10 +196,10 @@ def main(args):
         
         classification_engine(args, model_path, output_path, None, dataset_train, dataset_val, dataset_test)
 
-    elif args.data_set == "ImageNet":
-        dataset_train = ImageNet_Dataset(images_path=args.data_dir, file_path=args.train_list, augment=build_transform_classification(normalize=args.normalization, mode="train"))
-        dataset_val = ImageNet_Dataset(images_path=args.data_dir, file_path=args.val_list, augment=build_transform_classification(normalize=args.normalization, mode="valid"))
-        dataset_test = ImageNet_Dataset(images_path=args.data_dir, file_path=args.test_list, augment=build_transform_classification(normalize=args.normalization, mode="test", test_augment=args.test_augment))
+    elif args.data_set == "COCO":
+        dataset_train = COCO(images_path=args.data_dir, file_path=args.train_list, augment=build_transform_classification(normalize=args.normalization, mode="train"), n_samples=100000)
+        dataset_val = COCO(images_path=args.data_dir, file_path=args.val_list, augment=build_transform_classification(normalize=args.normalization, mode="valid"), n_samples=5000)
+        dataset_test = COCO(images_path=args.data_dir, file_path=args.test_list, augment=build_transform_classification(normalize=args.normalization, mode="test", test_augment=args.test_augment), n_samples=5000)
         
         classification_engine(args, model_path, output_path, None, dataset_train, dataset_val, dataset_test)
 
