@@ -57,7 +57,7 @@ def classification_engine(args, model_path, output_path, diseases, dataset_train
       best_val_loss = init_loss
       patience_counter = 0
       save_model_path = os.path.join(model_path, experiment)
-      if "vit" in args.model_name.lower():
+      if ("vit" in args.model_name.lower()) or ("swin" in args.model_name.lower()):
         criterion = torch.nn.BCEWithLogitsLoss()
         if args.data_set == "RSNAPneumonia":
           criterion = torch.nn.CrossEntropyLoss()
@@ -72,7 +72,7 @@ def classification_engine(args, model_path, output_path, diseases, dataset_train
 
       parameters = list(filter(lambda p: p.requires_grad, model.parameters()))
 
-      if "vit" in args.model_name.lower():
+      if ("vit" in args.model_name.lower()) or ("swin" in args.model_name.lower()):
         optimizer = create_optimizer(args, model)
         loss_scaler = NativeScaler()
         lr_scheduler, _ = create_scheduler(args, optimizer)

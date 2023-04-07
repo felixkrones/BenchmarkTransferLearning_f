@@ -6,6 +6,32 @@ python convert_to_deit.py \
   --output /home/ubuntu/models/moco/imagenet/vit_small/moco-v3_vits_300e_imagenet_deit.pth
 
 
+################################################################################
+# simmim benchmark
+################################################################################
+# Imagenet: 81.95
+python main_classification.py --data_set ChestXray14  \
+--model swin_base \
+--init simmim \
+--proxy_dir /Users/felixkrones/python_projects/models/simmim_pretrain__swin_base__img192_window6__800ep.pth \
+--data_dir /Users/felixkrones/python_projects/data/NIHChest14/images/ \
+--train_list dataset/Xray14_train_official.txt \
+--val_list dataset/Xray14_val_official.txt \
+--test_list dataset/Xray14_test_official.txt \
+--lr 0.01 --opt sgd --epochs 20 --warmup-epochs 0 --batch_size 64
+
+# Imagenet -> ChestXray14: 82.45
+python main_classification.py --data_set ChestXray14  \
+--model swin_base \
+--init simmim \
+--proxy_dir /Users/felixkrones/python_projects/models/simmim_swinb_ImageNet_ChestXray14.pth \
+--data_dir /Users/felixkrones/python_projects/data/NIHChest14/images/ \
+--train_list dataset/Xray14_train_official.txt \
+--val_list dataset/Xray14_val_official.txt \
+--test_list dataset/Xray14_test_official.txt \
+--lr 0.01 --opt sgd --epochs 20 --warmup-epochs 0 --batch_size 64
+
+
 
 ################################################################################
 # Fine-tuning benchmark
@@ -31,7 +57,7 @@ python main_classification.py --data_set ChestXray14 \
 --mode train \
 --resume True \
 --init gmml \
---proxy_dir /Users/felixkrones/python_projects/models/gmml_vits_NIH120e.pth \
+--proxy_dir /Users/felixkrones/python_projects/models/gmml_nih1000e_scratch_small.pth \
 --train_list dataset/Xray14_train_official.txt \
 --val_list dataset/Xray14_val_official.txt \
 --test_list dataset/Xray14_test_official.txt \

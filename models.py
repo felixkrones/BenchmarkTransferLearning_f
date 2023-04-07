@@ -17,7 +17,7 @@ import gmml.data_transformations
 
 
 def build_classification_model(args):
-    if "vit" in args.model_name.lower():
+    if ("vit" in args.model_name.lower()) or ("swin" in args.model_name.lower()):
         model = None
         if args.proxy_dir is None or args.proxy_dir =='':
             print('Loading pretrained {} weights for {} from timm.'.format(args.init, args.model_name))
@@ -136,7 +136,7 @@ def build_classification_model(args):
 
 
 def ClassificationNet(arch_name, num_class, args, conv=None, weight=None, activation=None):
-    if "vit" not in arch_name.lower():
+    if ("vit" not in arch_name.lower()) and ("swin" not in arch_name.lower()):
         if weight is None:
             weight = "none"
 

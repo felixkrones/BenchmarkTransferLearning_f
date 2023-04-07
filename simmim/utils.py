@@ -96,7 +96,7 @@ def reduce_tensor(tensor):
 
 
 def load_pretrained(config, model):
-    print(">>>>>>>>>> Fine-tuned from {config.PRETRAINED} ..........")
+    print(f">>>>>>>>>> Fine-tuned from {config.PRETRAINED} ..........")
     checkpoint = torch.load(config.PRETRAINED, map_location='cpu')
     checkpoint_model = checkpoint['model']
     

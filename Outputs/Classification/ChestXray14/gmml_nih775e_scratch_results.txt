@@ -1,0 +1,13 @@
+Disease = ['Atelectasis', 'Cardiomegaly', 'Effusion', 'Infiltration', 'Mass', 'Nodule', 'Pneumonia', 'Pneumothorax', 'Consolidation', 'Edema', 'Emphysema', 'Fibrosis', 'Pleural_Thickening', 'Hernia']
+gmml_nih775e_scratch_run_0: AUC test = [0.7643	0.8866	0.8271	0.7022	0.8151	0.7203	0.6971	0.8434	0.745 	0.85
+ 0.8208	0.7845	0.7738	0.7563]
+gmml_nih775e_scratch_run_0: AUC all = [0.7643	0.8866	0.8271	0.7022	0.8151	0.7203	0.6971	0.8434	0.745 	0.85
+ 0.8208	0.7845	0.7738	0.7563]
+gmml_nih775e_scratch_run_0: AUC test = 0.7848
+gmml_nih775e_scratch_run_0: AUC all = 0.7848
+All trials: test mAUC  = [0.7848]
+Mean AUC over All test trials = 0.7848
+STD over All test trials:  = 0.0000
+All trials: all mAUC  = [0.7848]
+Mean AUC over All all trials = 0.7848
+STD over All all trials:  = 0.0000

@@ -232,6 +232,8 @@ def update_config(config, args):
         config.MODEL.RESUME = args.resume
     if _check_args('pretrained_weights'):
         config.PRETRAINED = args.pretrained_weights
+    if _check_args('proxy_dir'):
+        config.PRETRAINED = args.proxy_dir
     if _check_args('accumulation_steps'):
         config.TRAIN.ACCUMULATION_STEPS = args.accumulation_steps
     if _check_args('use_checkpoint'):
