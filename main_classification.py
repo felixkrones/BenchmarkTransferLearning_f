@@ -89,7 +89,7 @@ def get_args_parser():
     parser.add_option("--patience", dest="patience", help="num of patient epoches", default=10, type="int")
     parser.add_option("--early_stop", dest="early_stop", help="whether use early_stop", default=True, action="callback",
                       callback=vararg_callback_bool)
-    parser.add_option("--trial", dest="num_trial", help="number of trials", default=1, type="int")
+    parser.add_option("--trial", dest="num_trial", help="number of trials", default=5, type="int")
     parser.add_option("--start_index", dest="start_index", help="the start model index", default=0, type="int")
     parser.add_option("--clean", dest="clean", help="clean the existing data", default=False, action="callback",
                       callback=vararg_callback_bool)
@@ -97,7 +97,7 @@ def get_args_parser():
                       callback=vararg_callback_bool)
     parser.add_option("--best", dest="best", help="whether to use last or best checkpoint", default="last", action="callback",
                       callback=vararg_callback_bool)
-    parser.add_option("--workers", dest="workers", help="number of CPU workers", default=4, type="int")
+    parser.add_option("--workers", dest="workers", help="number of CPU workers", default=8, type="int")
     parser.add_option("--print_freq", dest="print_freq", help="print frequency", default=50, type="int")
     parser.add_option("--test_augment", dest="test_augment", help="whether use test time augmentation",
                       default=False, action="callback", callback=vararg_callback_bool)
