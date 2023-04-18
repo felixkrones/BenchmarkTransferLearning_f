@@ -1,0 +1,37 @@
+Disease = ['Atelectasis', 'Cardiomegaly', 'Effusion', 'Infiltration', 'Mass', 'Nodule', 'Pneumonia', 'Pneumothorax', 'Consolidation', 'Edema', 'Emphysema', 'Fibrosis', 'Pleural_Thickening', 'Hernia']
+gmml_nih1000e_scratch_small_v2_run_0: AUC test = [0.7693	0.8844	0.8306	0.7004	0.8202	0.7209	0.7017	0.8325	0.7565	0.8418
+ 0.8293	0.8077	0.7666	0.804 ]
+gmml_nih1000e_scratch_small_v2_run_0: AUC all = [0.7693	0.8844	0.8306	0.7004	0.8202	0.7209	0.7017	0.8325	0.7565	0.8418
+ 0.8293	0.8077	0.7666	0.804 ]
+gmml_nih1000e_scratch_small_v2_run_0: AUC test = 0.7904
+gmml_nih1000e_scratch_small_v2_run_0: AUC all = 0.7904
+gmml_nih1000e_scratch_small_v2_run_1: AUC test = [0.7636	0.8822	0.826 	0.706 	0.8066	0.7172	0.6996	0.8438	0.7463	0.8444
+ 0.8214	0.7962	0.7658	0.7728]
+gmml_nih1000e_scratch_small_v2_run_1: AUC all = [0.7636	0.8822	0.826 	0.706 	0.8066	0.7172	0.6996	0.8438	0.7463	0.8444
+ 0.8214	0.7962	0.7658	0.7728]
+gmml_nih1000e_scratch_small_v2_run_1: AUC test = 0.7851
+gmml_nih1000e_scratch_small_v2_run_1: AUC all = 0.7851
+gmml_nih1000e_scratch_small_v2_run_2: AUC test = [0.7577	0.8883	0.827 	0.7004	0.8094	0.7143	0.7038	0.8486	0.7548	0.8506
+ 0.8356	0.791 	0.7667	0.7476]
+gmml_nih1000e_scratch_small_v2_run_2: AUC all = [0.7577	0.8883	0.827 	0.7004	0.8094	0.7143	0.7038	0.8486	0.7548	0.8506
+ 0.8356	0.791 	0.7667	0.7476]
+gmml_nih1000e_scratch_small_v2_run_2: AUC test = 0.7854
+gmml_nih1000e_scratch_small_v2_run_2: AUC all = 0.7854
+gmml_nih1000e_scratch_small_v2_run_3: AUC test = [0.758 	0.8899	0.8295	0.7011	0.8123	0.7183	0.7135	0.84  	0.7524	0.8433
+ 0.8196	0.8044	0.7691	0.8244]
+gmml_nih1000e_scratch_small_v2_run_3: AUC all = [0.758 	0.8899	0.8295	0.7011	0.8123	0.7183	0.7135	0.84  	0.7524	0.8433
+ 0.8196	0.8044	0.7691	0.8244]
+gmml_nih1000e_scratch_small_v2_run_3: AUC test = 0.7911
+gmml_nih1000e_scratch_small_v2_run_3: AUC all = 0.7911
+gmml_nih1000e_scratch_small_v2_run_4: AUC test = [0.761 	0.8858	0.8287	0.6972	0.8084	0.7114	0.7104	0.8456	0.7493	0.8453
+ 0.8283	0.7884	0.7648	0.7554]
+gmml_nih1000e_scratch_small_v2_run_4: AUC all = [0.761 	0.8858	0.8287	0.6972	0.8084	0.7114	0.7104	0.8456	0.7493	0.8453
+ 0.8283	0.7884	0.7648	0.7554]
+gmml_nih1000e_scratch_small_v2_run_4: AUC test = 0.7843
+gmml_nih1000e_scratch_small_v2_run_4: AUC all = 0.7843
+All trials: test mAUC  = [0.7904	0.7851	0.7854	0.7911	0.7843]
+Mean AUC over All test trials = 0.7873
+STD over All test trials:  = 0.0029
+All trials: all mAUC  = [0.7904	0.7851	0.7854	0.7911	0.7843]
+Mean AUC over All all trials = 0.7873
+STD over All all trials:  = 0.0029

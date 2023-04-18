@@ -1,0 +1,13 @@
+Disease = ['Atelectasis', 'Cardiomegaly', 'Effusion', 'Infiltration', 'Mass', 'Nodule', 'Pneumonia', 'Pneumothorax', 'Consolidation', 'Edema', 'Emphysema', 'Fibrosis', 'Pleural_Thickening', 'Hernia']
+gmml_checkpoint_1000_NIH_Umar_run_0: AUC test = [0.7733	0.8832	0.8293	0.7148	0.8223	0.7308	0.7274	0.8519	0.7613	0.8543
+ 0.8677	0.7969	0.7787	0.7851]
+gmml_checkpoint_1000_NIH_Umar_run_0: AUC all = [0.7733	0.8832	0.8293	0.7148	0.8223	0.7308	0.7274	0.8519	0.7613	0.8543
+ 0.8677	0.7969	0.7787	0.7851]
+gmml_checkpoint_1000_NIH_Umar_run_0: AUC test = 0.7984
+gmml_checkpoint_1000_NIH_Umar_run_0: AUC all = 0.7984
+All trials: test mAUC  = [0.7984]
+Mean AUC over All test trials = 0.7984
+STD over All test trials:  = 0.0000
+All trials: all mAUC  = [0.7984]
+Mean AUC over All all trials = 0.7984
+STD over All all trials:  = 0.0000
