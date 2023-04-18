@@ -9,27 +9,22 @@ python convert_to_deit.py \
 ################################################################################
 # simmim benchmark
 ################################################################################
-# Imagenet: 81.95
+# ChestXray14: 78.87
 python main_classification.py --data_set ChestXray14  \
+--data_dir /home/ubuntu/data/NIH/images \
 --model swin_base \
+--mode train \
+--resume True \
 --init simmim \
---proxy_dir /Users/felixkrones/python_projects/models/simmim_pretrain__swin_base__img192_window6__800ep.pth \
---data_dir /Users/felixkrones/python_projects/data/NIHChest14/images/ \
+--proxy_dir /home/ubuntu/models/simmim_swinb_Scratch_ChestXray14.pth \
 --train_list dataset/Xray14_train_official.txt \
 --val_list dataset/Xray14_val_official.txt \
 --test_list dataset/Xray14_test_official.txt \
---lr 0.01 --opt sgd --epochs 20 --warmup-epochs 0 --batch_size 64
-
-# Imagenet -> ChestXray14: 82.45
-python main_classification.py --data_set ChestXray14  \
---model swin_base \
---init simmim \
---proxy_dir /Users/felixkrones/python_projects/models/simmim_swinb_ImageNet_ChestXray14.pth \
---data_dir /Users/felixkrones/python_projects/data/NIHChest14/images/ \
---train_list dataset/Xray14_train_official.txt \
---val_list dataset/Xray14_val_official.txt \
---test_list dataset/Xray14_test_official.txt \
---lr 0.01 --opt sgd --epochs 20 --warmup-epochs 0 --batch_size 64
+--device cuda \
+--epochs 20 \
+--batch_size 48 \
+--trial 5 \
+--lr 0.1 --opt sgd
 
 
 
@@ -38,32 +33,33 @@ python main_classification.py --data_set ChestXray14  \
 ################################################################################
 7	    ViT_small	GMML	    Self-supervised 		NIH (1000e)
 python main_classification.py --data_set ChestXray14 \
---data_dir /Users/felixkrones/python_projects/data/NIHChest14/images/ \
+--data_dir /home/ubuntu/data/NIH/images \
 --model vit_small \
 --mode train \
 --resume True \
 --init gmml \
---proxy_dir /Users/felixkrones/python_projects/models/gmml_checkpoint_1000_NIH.pth \
+--proxy_dir /home/ubuntu/models/gmml_checkpoint_1000_NIH_Umar.pth \
 --train_list dataset/Xray14_train_official.txt \
 --val_list dataset/Xray14_val_official.txt \
 --test_list dataset/Xray14_test_official.txt \
---device mps \
+--device cuda \
 --epochs 20 \
 --batch_size 64
 
 python main_classification.py --data_set ChestXray14 \
---data_dir /Users/felixkrones/python_projects/data/NIHChest14/images/ \
+--data_dir /home/ubuntu/data/NIH/images \
 --model vit_small \
 --mode train \
 --resume True \
 --init gmml \
---proxy_dir /Users/felixkrones/python_projects/models/gmml_nih1000e_scratch_small.pth \
+--proxy_dir /home/ubuntu/models/gmml_nih1000e_scratch_small_3d.pth \
 --train_list dataset/Xray14_train_official.txt \
 --val_list dataset/Xray14_val_official.txt \
 --test_list dataset/Xray14_test_official.txt \
---device mps \
+--device cuda \
 --epochs 20 \
---batch_size 64
+--batch_size 64 \
+--trial 6
 
 
 8	    ViT_small	SiT	    Self-supervised 		NIH (200e)

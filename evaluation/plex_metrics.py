@@ -16,7 +16,7 @@ from typing import List
 
 
 def plex_evaluate(
-    p_out,
+    preds: np.ndarray,
     target_labels: np.ndarray,
     eval_args: dict,
     classes: List[str],
@@ -38,6 +38,12 @@ def plex_evaluate(
     """
 
     metrics = {}
+    multilabel = True
+    preds_probs = preds
+    if multilabel:
+        preds_labels = np.array([[1 if p_ > eval_args["decision_threshold"] else 0 for p_ in p] for p in preds])
+    else:
+        preds_labels = np.argmax(preds, axis=1)
 
     # Calculate the random guessing accuracy
     distribution_per_class = [
@@ -47,7 +53,7 @@ def plex_evaluate(
     acc_random_per_class = [1 - d for d in distribution_per_class]
 
     # Uncertainty metrics
-    metrics["auc"] = metric_AUROC(target_labels, p_out)
+    metrics["auc"] = metric_AUROC(target_labels, preds)
     metrics["avg_auc_prob"] = round(np.mean(metric_AUROC(target_labels, preds)), 4)
     metrics["oracle_auc"] = round(
         selective_prediction(
@@ -102,6 +108,10 @@ def plex_evaluate(
     metrics["mean_acc"] = round(np.mean(metrics["acc_per_class"]), 4)
     metrics["acc_random_guessing"] = round(np.mean(acc_random_per_class), 4)
     metrics["err"] = round(f1_score(target_labels, preds_labels, average="macro"), 4)
+
+
+    # Subpopulation metrics
+    print("Calculating subpopulation metrics...")
     if meta_data is not None:
         if eval_args["independent_reg_variable"] in meta_data.columns:
             metrics["temporal_err"] = regression_metrics(
