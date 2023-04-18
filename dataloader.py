@@ -260,7 +260,7 @@ class ChestXray14Dataset_general(Dataset):
     self.img_list = []
     self.img_label = []
     self.augment = augment
-    self._annotation_file = pd.read_csv(pathlib.Path(images_path) / annotation_file)
+    self._annotation_file = pd.read_csv(pathlib.Path('/'.join(images_path.split('/')[:-2])) / annotation_file)
     self.possible_labels = possible_labels
 
     with open(file_path, "r") as fileDescriptor:

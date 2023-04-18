@@ -16,7 +16,7 @@ from engine import classification_engine
 sys.setrecursionlimit(40000)
 
 
-def get_args_parser():
+def get_args_parser(main_args:bool=True):
     parser = OptionParser()
 
     parser.add_option("--GPU", dest="GPU", help="the index of gpu is used", default=None, action="callback",
@@ -77,7 +77,7 @@ def get_args_parser():
                         help='lower lr bound for cyclic schedulers that hit 0 (1e-5)')
     parser.add_option('--decay-epochs', type=float, default=30, metavar='N',
                         help='epoch interval to decay LR')
-    parser.add_option('--warmup-epochs', type=int, default=20, metavar='N',
+    parser.add_option('--warmup-epochs', type=int, default=5, metavar='N',
                         help='epochs to warmup LR, if scheduler supports')
     parser.add_option('--cooldown-epochs', type=int, default=10, metavar='N',
                         help='epochs to cooldown LR at min_lr, after cyclic schedule ends')
@@ -112,10 +112,11 @@ def get_args_parser():
     parser.add_option("--unknown_label", dest="unknown_label", help="the label assigned to unknown data",
                       default=0, type="int")
 
-
-    (options, args) = parser.parse_args()
-
-    return options
+    if main_args:
+        (options, args) = parser.parse_args()
+        return options
+    else:
+        return parser
 
 
 def main(args):
@@ -139,10 +140,6 @@ def main(args):
         diseases = ['Atelectasis', 'Cardiomegaly', 'Effusion', 'Infiltration', 'Mass', 'Nodule',
                     'Pneumonia', 'Pneumothorax', 'Consolidation', 'Edema',
                     'Emphysema', 'Fibrosis', 'Pleural_Thickening', 'Hernia']
-        #test_diseases = [diseases.index(c) for c in test_diseases_name]
-        #dataset_train = ChestXray14Dataset_general(images_path=args.data_dir, file_path=args.train_list,augment=build_transform_classification(normalize=args.normalization, mode="train"), possible_labels=test_diseases_name)
-        #dataset_val = ChestXray14Dataset_general(images_path=args.data_dir, file_path=args.val_list,augment=build_transform_classification(normalize=args.normalization, mode="valid"), possible_labels=test_diseases_name)
-        #dataset_test = ChestXray14Dataset_general(images_path=args.data_dir, file_path=args.test_list,augment=build_transform_classification(normalize=args.normalization, mode="test", test_augment=args.test_augment), possible_labels=test_diseases_name)
         dataset_train = ChestXray14Dataset(images_path=args.data_dir, file_path=args.train_list,augment=build_transform_classification(normalize=args.normalization, mode="train"))
         dataset_val = ChestXray14Dataset(images_path=args.data_dir, file_path=args.val_list,augment=build_transform_classification(normalize=args.normalization, mode="valid"))
         dataset_test = ChestXray14Dataset(images_path=args.data_dir, file_path=args.test_list,augment=build_transform_classification(normalize=args.normalization, mode="test", test_augment=args.test_augment))

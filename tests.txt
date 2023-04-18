@@ -22,7 +22,9 @@ python main_classification.py --data_set ChestXray14  \
 --test_list dataset/Xray14_test_official.txt \
 --device cuda \
 --epochs 20 \
---batch_size 64
+--batch_size 48 \
+--trial 5 \
+--lr 0.1 --opt sgd
 
 
 
@@ -50,14 +52,14 @@ python main_classification.py --data_set ChestXray14 \
 --mode train \
 --resume True \
 --init gmml \
---proxy_dir /home/ubuntu/models/gmml_nih1000e_scratch_small.pth \
+--proxy_dir /home/ubuntu/models/gmml_nih1000e_scratch_small_3d.pth \
 --train_list dataset/Xray14_train_official.txt \
 --val_list dataset/Xray14_val_official.txt \
 --test_list dataset/Xray14_test_official.txt \
 --device cuda \
 --epochs 20 \
 --batch_size 64 \
---trial 2
+--trial 6
 
 
 8	    ViT_small	SiT	    Self-supervised 		NIH (200e)
