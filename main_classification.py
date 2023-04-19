@@ -42,7 +42,8 @@ def get_args_parser(main_args:bool=True):
                       default=None, type="string")
     parser.add_option("--mode", dest="mode", help="train | test", default="train", type="string")
     parser.add_option("--batch_size", dest="batch_size", help="batch size", default=128, type="int")
-    parser.add_option("--epochs", dest="num_epoch", help="num of epoches", default=20, type="int")
+    parser.add_option("--epochs", dest="num_epoch", help="num of epoches", default=30, type="int")
+
     # Optimizer parameters
     parser.add_option("--optimizer", dest="optimizer", help="Adam | SGD", default="Adam", type="string")
     parser.add_option('--opt', default='adamw', type=str, metavar='OPTIMIZER',
@@ -55,14 +56,15 @@ def get_args_parser(main_args:bool=True):
                         help='Clip gradient norm (default: None, no clipping)')
     parser.add_option('--momentum', type=float, default=0.9, metavar='M',
                         help='SGD momentum (default: 0.9)')
-    parser.add_option('--weight-decay', type=float, default=0.0,
+    parser.add_option('--weight-decay', type=float, default=0.05,
                     help='weight decay (default: 0.05)')
     parser.add_option('--momentum-decay', type=float, default=0.0,
                         help='weight decay (default: 0.05)')
+    
     # Learning rate schedule parameters
     parser.add_option('--sched', default='cosine', type=str, metavar='SCHEDULER',
                         help='LR scheduler (default: "cosine"')
-    parser.add_option("--lr", dest="lr", help="learning rate", default=1e-5, type="float")
+    parser.add_option("--lr", dest="lr", help="learning rate", default=2.5e-6, type="float")
     parser.add_option("--lr_Scheduler", dest="lr_Scheduler", help="learning schedule", default="ReduceLROnPlateau",
                       type="string")
     parser.add_option('--lr-noise', type=float, nargs='+', default=None, metavar='pct, pct',
@@ -73,7 +75,7 @@ def get_args_parser(main_args:bool=True):
                         help='learning rate noise std-dev (default: 1.0)')
     parser.add_option('--warmup-lr', type=float, default=1e-6, metavar='LR',
                         help='warmup learning rate (default: 1e-6)')
-    parser.add_option('--min-lr', type=float, default=1e-5, metavar='LR',
+    parser.add_option('--min-lr', type=float, default=5e-7, metavar='LR',
                         help='lower lr bound for cyclic schedulers that hit 0 (1e-5)')
     parser.add_option('--decay-epochs', type=float, default=30, metavar='N',
                         help='epoch interval to decay LR')

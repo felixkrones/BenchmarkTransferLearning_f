@@ -93,7 +93,7 @@ def test_classification(checkpoint, data_loader_test, device, args):
   else:
     model = ClassificationNet(args.model_name.lower(), args.num_class, args, activation=args.activate)
 
-  modelCheckpoint = torch.load(checkpoint)
+  modelCheckpoint = torch.load(checkpoint, map_location=device)
   state_dict = modelCheckpoint['state_dict']
   for k in list(state_dict.keys()):
     if k.startswith('module.'):
