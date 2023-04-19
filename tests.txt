@@ -43,7 +43,7 @@ python main_classification.py --data_set ChestXray14 \
 --val_list dataset/Xray14_val_official.txt \
 --test_list dataset/Xray14_test_official.txt \
 --device cuda \
---epochs 20 \
+--epochs 30 \
 --batch_size 64
 
 python main_classification.py --data_set ChestXray14 \
