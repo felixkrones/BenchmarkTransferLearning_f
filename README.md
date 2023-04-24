@@ -48,7 +48,7 @@ It mainly extends the original repository in the following five ways:
   1. Download the data from [Padchest](https://bimcv.cipf.es/bimcv-projects/padchest/)
     - Not all, maybe only the 0.zip file. This gives you 1861 manually labelled, frontal view images
     1. Download the [metadata file](https://b2drop.bsc.es/index.php/s/BIMCV-PadChest-FULL/download?path=%2F&files=PADCHEST_chest_x_ray_images_labels_160K_01.02.19.csv.gz)
-    2. Download the 0.zip folder
+    2. Download the 0.zip folder from (https://b2drop.bsc.es/index.php/s/BIMCV-PadChest-FULL)
 
 
 

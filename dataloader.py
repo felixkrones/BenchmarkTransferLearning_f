@@ -100,7 +100,7 @@ def build_transform_segmentation():
 
 
 class PadchestDataset(Dataset):
-  def __init__(self, images_path, file_path, augment, possible_labels):
+  def __init__(self, images_path, file_path, augment, diseases_to_test):
     self.img_path_col = "ImageID"
     self.label_col = "Labels"
     self.filter_dir = {
@@ -118,15 +118,15 @@ class PadchestDataset(Dataset):
     # Get image paths
     self.img_list = [os.path.join(images_path, x) for x in self.annotation_file[self.img_path_col].values]
 
-    # Get labels 
-    for p in possible_labels:
-      if p == "No Finding":
-         p = "normal"
-      self.annotation_file[p] = self.annotation_file[self.label_col].apply(lambda x: 1 if p.lower() in x else 0)
-    self.img_label = self.annotation_file[possible_labels].values
+    # Get possible labels
+    self.possible_labels = np.unique([list for sublist in self.annotation_file['Labels'].fillna('[]').apply(lambda x: eval(x)).values.tolist() for list in sublist] + [d.lower() for d in diseases_to_test])
+
+    # Get labels
+    df_aux = pd.concat([self.annotation_file[self.label_col].apply(lambda x: 1 if p in eval(x) else 0).rename(p) for p in self.possible_labels], axis=1)
+    self.annotation_file = pd.concat((self.annotation_file, df_aux), axis=1)
+    self.img_label = self.annotation_file[self.possible_labels].values
 
     self.annotation_file.to_csv(file_path.replace(".csv", "_filtered.csv"), index=False)
-
 
   def __len__(self):
     self._length = len(self.img_list)
@@ -140,7 +140,7 @@ class PadchestDataset(Dataset):
     imageData = Image.open(imagePath).convert('RGB')
     imageLabel = torch.FloatTensor(self.img_label[index])
 
-    if self.transform != None: imageData = self.augment(imageData)
+    if self.transform != None: imageData = self.transform(imageData)
 
     return imageData, imageLabel
   
