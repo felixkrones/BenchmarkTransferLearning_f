@@ -45,11 +45,15 @@ It mainly extends the original repository in the following five ways:
     3. Unzip all files
         - `cd chexpertchestxrays-u20210408 && unzip CheXpert-v1.0.zip`
 - Padchest
-  1. Download the data from [Padchest](https://bimcv.cipf.es/bimcv-projects/padchest/)
-    - Not all, maybe only the 0.zip file. This gives you 1861 manually labelled, frontal view images
+  - Download the data from [Padchest](https://bimcv.cipf.es/bimcv-projects/padchest/)
+  - Not all, maybe only the 0.zip file. This gives you 1861 manually labelled, frontal view images
     1. Download the [metadata file](https://b2drop.bsc.es/index.php/s/BIMCV-PadChest-FULL/download?path=%2F&files=PADCHEST_chest_x_ray_images_labels_160K_01.02.19.csv.gz)
     2. Download the 0.zip folder from (https://b2drop.bsc.es/index.php/s/BIMCV-PadChest-FULL)
-
+- VinDr-CXR
+  - Download data from [VinDr-CXR](https://physionet.org/content/vindr-cxr/1.0.0/)
+    1. Only get the test data: `wget -r -N -c -np --user felixkrones --ask-password https://physionet.org/files/vindr-cxr/1.0.0/test/`
+    2. Get the annotations: `wget -r -N -c -np --user felixkrones --ask-password https://physionet.org/files/vindr-cxr/1.0.0/annotations/`
+    3. Unzip
 
 
 ### Running code in parallel
