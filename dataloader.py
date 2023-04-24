@@ -27,7 +27,7 @@ from albumentations import (
 
 
 
-def build_transform_classification(normalize, crop_size=224, resize=256, mode="train", test_augment=False, nc=3):
+def build_transform_classification(normalize, crop_size=224, resize=224, mode="train", test_augment=False, nc=3):
     transformations_list = []
 
     if normalize.lower() == "imagenet":
@@ -127,6 +127,7 @@ class PadchestDataset(Dataset):
     self.img_label = self.annotation_file[self.possible_labels].values
 
     self.annotation_file.to_csv(file_path.replace(".csv", "_filtered.csv"), index=False)
+    self.possible_labels = self.possible_labels.tolist()
 
   def __len__(self):
     self._length = len(self.img_list)
@@ -669,3 +670,35 @@ class PNEDataset(Dataset):
         im=im.transpose(2, 0, 1).astype('float32')
         mask=np.expand_dims(mask,axis=0)
         return (im, mask)
+
+
+class VinDrCXR(Dataset):
+    def __init__(self, images_path, file_path, augment):
+        self.img_list = []
+        self.img_label = []
+        self.augment = augment
+        annotation_file = pd.read_csv(os.path.join(images_path, "physionet.org/files/vindr-cxr/1.0.0/annotations/image_labels_test.csv"))
+
+        self.possible_labels = annotation_file.columns[1:].tolist()
+
+        with open(file_path, "r") as fr:
+            line = fr.readline().strip()
+            while line:
+                lineItems = line.split()
+                imagePath = os.path.join(images_path, lineItems[0]+".jpg")
+                image_id = lineItems[0].split("/")[-1]
+                imageLabel = np.array([int(i) for i in annotation_file[annotation_file["image_id"] == image_id].values[0][1:]])
+                self.img_list.append(imagePath)
+                self.img_label.append(imageLabel)
+                line = fr.readline()
+
+    def __getitem__(self, index):
+        imagePath = self.img_list[index]
+        imageLabel = torch.from_numpy(self.img_label[index])
+        imageData = Image.open(imagePath).convert('RGB')
+        if self.augment != None: 
+           imageData = self.augment(imageData)
+        return imageData, imageLabel
+    
+    def __len__(self):
+        return len(self.img_list)
