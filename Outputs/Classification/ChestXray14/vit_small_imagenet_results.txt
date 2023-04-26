@@ -1,0 +1,31 @@
+Disease = ['Atelectasis', 'Cardiomegaly', 'Effusion', 'Infiltration', 'Mass', 'Nodule', 'Pneumonia', 'Pneumothorax', 'Consolidation', 'Edema', 'Emphysema', 'Fibrosis', 'Pleural_Thickening', 'Hernia']
+vit_small_imagenet_run_0: AUC test = [0.74  	0.8095	0.7953	0.6848	0.746 	0.7087	0.6848	0.8197	0.7153	0.8338
+ 0.821 	0.7668	0.7176	0.8203]
+vit_small_imagenet_run_0: AUC all = [0.74  	0.8095	0.7953	0.6848	0.746 	0.7087	0.6848	0.8197	0.7153	0.8338
+ 0.821 	0.7668	0.7176	0.8203]
+vit_small_imagenet_run_0: AUC test = 0.7617
+vit_small_imagenet_run_0: AUC all = 0.7617
+vit_small_imagenet_run_1: AUC test = [0.7366	0.8073	0.795 	0.6842	0.7527	0.7028	0.6764	0.812 	0.7117	0.8292
+ 0.8069	0.7791	0.7145	0.7751]
+vit_small_imagenet_run_1: AUC all = [0.7366	0.8073	0.795 	0.6842	0.7527	0.7028	0.6764	0.812 	0.7117	0.8292
+ 0.8069	0.7791	0.7145	0.7751]
+vit_small_imagenet_run_1: AUC test = 0.7560
+vit_small_imagenet_run_1: AUC all = 0.7560
+vit_small_imagenet_run_2: AUC test = [0.7335	0.8194	0.7949	0.6869	0.7411	0.7015	0.6771	0.8091	0.714 	0.8321
+ 0.8123	0.7552	0.7117	0.7387]
+vit_small_imagenet_run_2: AUC all = [0.7335	0.8194	0.7949	0.6869	0.7411	0.7015	0.6771	0.8091	0.714 	0.8321
+ 0.8123	0.7552	0.7117	0.7387]
+vit_small_imagenet_run_2: AUC test = 0.7520
+vit_small_imagenet_run_2: AUC all = 0.7520
+vit_small_imagenet_run_3: AUC test = [0.7265	0.783 	0.7854	0.6846	0.7124	0.6878	0.6689	0.8156	0.7021	0.8226
+ 0.8118	0.7409	0.7153	0.7809]
+vit_small_imagenet_run_3: AUC all = [0.7265	0.783 	0.7854	0.6846	0.7124	0.6878	0.6689	0.8156	0.7021	0.8226
+ 0.8118	0.7409	0.7153	0.7809]
+vit_small_imagenet_run_3: AUC test = 0.7456
+vit_small_imagenet_run_3: AUC all = 0.7456
+All trials: test mAUC  = [0.7617	0.756 	0.752 	0.7456]
+Mean AUC over All test trials = 0.7538
+STD over All test trials:  = 0.0059
+All trials: all mAUC  = [0.7617	0.756 	0.752 	0.7456]
+Mean AUC over All all trials = 0.7538
+STD over All all trials:  = 0.0059

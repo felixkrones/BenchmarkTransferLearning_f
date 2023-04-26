@@ -78,7 +78,7 @@ python main_classification.py --data_set ChestXray14 \
 
 2.1	vit_small	supervised	Random
 python main_classification.py --data_set ChestXray14 \
---data_dir /home/ubuntu/data/NIHChest14/images/ \
+--data_dir /home/ubuntu/data/NIH/images/ \
 --model vit_small \
 --mode train \
 --resume True \
@@ -90,7 +90,23 @@ python main_classification.py --data_set ChestXray14 \
 --batch_size 64 \
 --epochs 20 \
 --lr 1e-5 \
---min_lr 1e-6 \
+--trial 4
+
+
+2.2	vit_small	supervised	Imagenet
+python main_classification.py --data_set ChestXray14 \
+--data_dir /home/ubuntu/data/NIH/images/ \
+--model vit_small \
+--mode train \
+--resume True \
+--init imagenet \
+--train_list dataset/Xray14_train_official.txt \
+--val_list dataset/Xray14_val_official.txt \
+--test_list dataset/Xray14_test_official.txt \
+--device cuda \
+--batch_size 64 \
+--epochs 20 \
+--lr 1e-5 \
 --trial 4
 
 
