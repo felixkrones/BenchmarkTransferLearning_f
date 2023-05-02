@@ -313,11 +313,12 @@ class ChestXray14Dataset_general(Dataset):
 
 class ChestXray14Dataset(Dataset):
 
-  def __init__(self, images_path, file_path, augment, num_class=14, annotaion_percent=100):
+  def __init__(self, images_path, file_path, augment, num_class=14, annotaion_percent=100, args=None):
 
     self.img_list = []
     self.img_label = []
     self.augment = augment
+    self.nc = args.nc
 
     with open(file_path, "r") as fileDescriptor:
       line = True
@@ -353,7 +354,12 @@ class ChestXray14Dataset(Dataset):
 
     imagePath = self.img_list[index]
 
-    imageData = Image.open(imagePath).convert('RGB')
+    if self.nc == 3:
+      imageData = Image.open(imagePath).convert('RGB')
+    elif self.nc == 1:
+      imageData = Image.open(imagePath).convert('L')
+    else:
+       raise ValueError(f"args.nc must be 1 or 3, not {self.nc}")
     imageLabel = torch.FloatTensor(self.img_label[index])
 
     if self.augment != None: imageData = self.augment(imageData)

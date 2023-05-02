@@ -20,7 +20,7 @@ def build_classification_model(args):
     if ("vit" in args.model_name.lower()) or ("swin" in args.model_name.lower()):
         model = None
         if args.proxy_dir is None or args.proxy_dir =='':
-            print('Loading pretrained {} weights for {} from timm.'.format(args.init, args.model_name))
+            print('Loading {} weights for {} from timm.'.format(args.init, args.model_name))
             if args.model_name.lower() == "vit_base":
                 if args.init.lower() =="random":
                     model = VisionTransformer(num_classes=args.num_class,
@@ -71,7 +71,12 @@ def build_classification_model(args):
                     model = get_prepared_checkpoint(model, "models/gmml_1000e_nih.pth")
                     #model = LabelTokenViT(args.num_class, model, label_layers=args.label_layers)
                 elif args.init.lower() =="deit":
-                    model = timm.create_model('deit_small_patch16_224', num_classes=args.num_class, pretrained=True)           
+                    model = timm.create_model('deit_small_patch16_224', num_classes=args.num_class, pretrained=True) 
+                else:
+                    print("Creating empty model:")
+                    model = VisionTransformer(num_classes=args.num_class,in_chans=args.nc,
+                        patch_size=16, embed_dim=384, depth=12, num_heads=6, mlp_ratio=4, qkv_bias=True,
+                        norm_layer=partial(nn.LayerNorm, eps=1e-6))    
 
             elif args.model_name.lower() == "swin_base": 
                 if args.init.lower() =="random":
@@ -88,7 +93,7 @@ def build_classification_model(args):
                     model = timm.create_model('swin_tiny_patch4_window7_224', num_classes=args.num_class, pretrained=True)
             
         elif os.path.isfile(args.proxy_dir):
-            print("Creating model from pretrained weights: "+ args.proxy_dir)
+            print("Creating model from proxy_dir weights: "+ args.proxy_dir)
             if args.model_name.lower() == "vit_base":
                 if args.init.lower() == "simmim":
                     model = simmim.create_model(args)
@@ -285,7 +290,12 @@ def load_proxy_dir(model, init, proxy_dir):
         state_dict = get_prepared_checkpoint(model, proxy_dir)
     else:
         print("Trying to load the checkpoint for {} at {}, but we cannot guarantee the success.".format(init, proxy_dir))
-        state_dict = checkpoint["state_dict"]
+        if "state_dict" in checkpoint:
+            state_dict = checkpoint["state_dict"]
+        elif "model" in checkpoint:
+            state_dict = checkpoint["model"]
+        else:
+            raise ValueError(f"No state_dict or model in checkpoint: {checkpoint.keys()}")
     msg = model.load_state_dict(state_dict, strict=False)
     print('Loaded with msg: {}'.format(msg))
     return model

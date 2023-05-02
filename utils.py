@@ -47,6 +47,8 @@ class ProgressLogger(object):
 def metric_AUROC(target, output, nb_classes=14):
     outAUROC = []
 
+    nb_classes = output.shape[-1]
+
     target = target.cpu().numpy()
     output = output.cpu().numpy()
 

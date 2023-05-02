@@ -54,6 +54,8 @@ It mainly extends the original repository in the following five ways:
     1. Only get the test data: `wget -r -N -c -np --user felixkrones --ask-password https://physionet.org/files/vindr-cxr/1.0.0/test/`
     2. Get the annotations: `wget -r -N -c -np --user felixkrones --ask-password https://physionet.org/files/vindr-cxr/1.0.0/annotations/`
     3. Unzip
+- OCT
+  1. Download the (dataset)[https://data.mendeley.com/datasets/rscbjbr9sj/3]
 
 
 ### Running code in parallel

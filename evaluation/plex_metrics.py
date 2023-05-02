@@ -13,15 +13,17 @@ from sklearn.metrics import (
 )
 from scipy import stats
 from typing import List
+import warnings
+
+# Ingore all RunTimeWarnings
+warnings.filterwarnings("ignore", category=RuntimeWarning)
 
 
 def plex_evaluate(
     preds: np.ndarray,
     target_labels: np.ndarray,
     eval_args: dict,
-    classes: List[str],
     meta_data: pd.DataFrame = None,
-    underdiagnosis_label: str = None,
 ) -> dict:
     """Evaluate the predictions of a model using the metrics from the PLEX paper.
 
@@ -40,8 +42,14 @@ def plex_evaluate(
     metrics = {}
     multilabel = True
     preds_probs = preds
+    metrics["decision_threshold"] = eval_args["decision_threshold"]
     if multilabel:
-        preds_labels = np.array([[1 if p_ > eval_args["decision_threshold"] else 0 for p_ in p] for p in preds])
+        preds_labels = np.array(
+            [
+                [1 if p_ > eval_args["decision_threshold"] else 0 for p_ in p]
+                for p in preds
+            ]
+        )
     else:
         preds_labels = np.argmax(preds, axis=1)
 
@@ -53,37 +61,35 @@ def plex_evaluate(
     acc_random_per_class = [1 - d for d in distribution_per_class]
 
     # Uncertainty metrics
-    metrics["auc"] = metric_AUROC(target_labels, preds)
-    metrics["avg_auc_prob"] = round(np.mean(metric_AUROC(target_labels, preds)), 4)
-    metrics["oracle_auc"] = round(
-        selective_prediction(
-            preds_probs,
-            preds_labels,
-            target_labels,
-            eval_args["selective_threshold"],
-            "auc",
-            "oracle",
-            multilabel,
-        ),
-        4,
+    metrics["auc"] = [round(a, 4) for a in metric_AUROC(target_labels, preds)]
+    metrics["auc_mean"] = np.array([i for i in metric_AUROC(target_labels, preds) if i > 0]).mean()
+    metrics["avg_auc_prob"] = round(
+        np.array([i for i in metric_AUROC(target_labels, preds) if i > 0]).mean(), 4
     )
-    metrics["rejection_auc"] = round(
-        selective_prediction(
-            preds_probs,
-            preds_labels,
-            target_labels,
-            eval_args["selective_threshold"],
-            "auc",
-            "rejection",
-            multilabel,
-        ),
-        4,
+    metrics["oracle_threshold"] = eval_args["selective_threshold"]
+    metrics["oracle_auc_mean"], metrics["oracle_auc"] = selective_prediction(
+        preds_probs=preds_probs.copy(),
+        preds_labels=preds_labels.copy(),
+        target_labels=target_labels.copy(),
+        thresholds=eval_args["selective_threshold"],
+        metric="auc",
+        method="oracle",
+        multilabel=multilabel,
+    )
+    metrics["rejection_auc_mean"], metrics["rejection_auc"] = selective_prediction(
+        preds_probs=preds_probs.copy(),
+        preds_labels=preds_labels.copy(),
+        target_labels=target_labels.copy(),
+        thresholds=eval_args["selective_threshold"],
+        metric="auc",
+        method="rejection",
+        multilabel=multilabel,
     )
     metrics["calibration_error"] = round(
         expected_calibration_error(
-            preds_probs=preds_probs,
-            preds_labels=preds_labels,
-            target_labels=target_labels,
+            preds_probs=preds_probs.copy(),
+            preds_labels=preds_labels.copy(),
+            target_labels=target_labels.copy(),
             num_bins=eval_args["ece_num_bins"],
         ),
         4,
@@ -106,13 +112,16 @@ def plex_evaluate(
     # Robust generalisation metrics
     metrics["subset_acc"] = round(accuracy_score(target_labels, preds_labels), 4)
     metrics["mean_acc"] = round(np.mean(metrics["acc_per_class"]), 4)
-    metrics["acc_random_guessing"] = round(np.mean(acc_random_per_class), 4)
-    metrics["err"] = round(f1_score(target_labels, preds_labels, average="macro"), 4)
-
+    metrics["mean_acc_random_guessing"] = round(np.mean(acc_random_per_class), 4)
+    metrics["f1_score"] = round(
+        f1_score(target_labels, preds_labels, average="micro"), 4
+    )
+    metrics["underdiagnosis"] = underdiagnosis(target_labels, preds_labels)
+    metrics["underdiagnosis_mean"] = round(np.nanmean(metrics["underdiagnosis"]), 4)
 
     # Subpopulation metrics
-    print("Calculating subpopulation metrics...")
     if meta_data is not None:
+        print("Calculating subpopulation metrics...")
         if eval_args["independent_reg_variable"] in meta_data.columns:
             metrics["temporal_err"] = regression_metrics(
                 target_labels,
@@ -120,13 +129,13 @@ def plex_evaluate(
                 meta_data[eval_args["independent_reg_variable"]],
                 "err",
             )
-        metrics["subpopulation_err"] = {
+        metrics["subpopulation_f1_score"] = {
             g: {
                 str(c): round(
                     f1_score(
                         target_labels[meta_data[g] == c],
                         preds_labels[meta_data[g] == c],
-                        average="macro",
+                        average="micro",
                     ),
                     4,
                 )
@@ -135,23 +144,33 @@ def plex_evaluate(
             }
             for g in eval_args["subpopulation_groups"]
         }
-        if underdiagnosis_label is not None:
-            metrics["underdiagnosis"] = {
-                g: {
-                    str(c): round(
-                        underdiagnosis(
-                            target_labels[meta_data[g] == c],
-                            preds_labels[meta_data[g] == c],
-                            classes=classes,
-                            underdiagnosis_label=underdiagnosis_label,
-                        ),
-                        4,
-                    )
-                    for c in meta_data[g].unique()
-                    if c is not np.nan
-                }
-                for g in eval_args["subpopulation_groups"]
+        metrics["subpopulation_callibration"] = {
+            g: {
+                str(c): round(
+                    expected_calibration_error(
+                        preds_probs=preds_probs[meta_data[g] == c].copy(),
+                        preds_labels=preds_labels[meta_data[g] == c].copy(),
+                        target_labels=target_labels[meta_data[g] == c].copy(),
+                        num_bins=eval_args["ece_num_bins"],
+                    ),
+                    4,
+                )
+                for c in meta_data[g].unique()
+                if c is not np.nan
             }
+            for g in eval_args["subpopulation_groups"]
+        }
+        metrics["subpopulation_underdiagnosis"] = {
+            g: {
+                str(c): underdiagnosis(
+                    target_labels[meta_data[g] == c],
+                    preds_labels[meta_data[g] == c],
+                )
+                for c in meta_data[g].unique()
+                if c is not np.nan
+            }
+            for g in eval_args["subpopulation_groups"]
+        }
 
     return metrics
 
@@ -175,29 +194,23 @@ def metric_AUROC(target, output):
     return np.array(outAUROC)
 
 
-def underdiagnosis(
-    ytrue: np.ndarray, ypred: np.ndarray, classes: list, underdiagnosis_label: str
-) -> float:
-    """Calculate underdisagnosis score as false positive rate for class "No Finding" in classes.
+def underdiagnosis(ytrue: np.ndarray, ypred: np.ndarray) -> float:
+    """Calculate underdisagnosis scores as false negative rate.
 
     Args:
        ytrue (np.ndarray): The true labels.
        ypred (np.ndarray): The predicted labels.
-       classes (list): The classes.
-       underdiagnosis_label (str): Underdiagnosis label
 
     Returns:
        float: The underdiagnosis score.
     """
 
-    # Calculate all false positive scores for all classes:
-    fp = np.sum((ypred == 1) & (ytrue == 0), axis=0)
+    # Calculate all false negative scores for all classes and standardise:
+    fn = np.sum((ypred == 0) & (ytrue == 1), axis=0)
 
-    # Select fp score for class "No Finding" from classes:
-    fp_no_finding = fp[classes.index(underdiagnosis_label)]
-
-    # Calculate underdiagnosis score:
-    underdiagnosis = fp_no_finding / np.sum(ytrue == 0)
+    # Calculate underdiagnosis score, return nan if no positive labels:
+    p = np.sum(ytrue == 1, axis=0)
+    underdiagnosis = [np.nan if p[i] == 0 else fn[i] / p[i] for i in range(len(p))]
 
     return underdiagnosis
 
@@ -244,10 +257,10 @@ def selective_prediction(
     preds_probs: np.ndarray,
     preds_labels: np.ndarray,
     target_labels: np.ndarray,
-    threshold: float,
+    thresholds: List[float],
     metric: str,
     method: str,
-    multilabel: bool,
+    multilabel: bool = True,
 ) -> float:
     """Calculate the selective prediction metric for a given set of predictions and targets.
     The selective prediction metric is calculated as the accuracy, error or AUC of the predictions for which the maximum probability is above a given threshold.
@@ -269,50 +282,63 @@ def selective_prediction(
        ValueError: If the metric or method is unknown.
     """
 
-    no_values = int(len(preds_probs) * threshold)
-    if multilabel:
-        idx_most_uncertain = np.argpartition(
-            [min(o) for o in abs(preds_probs - 0.5)], no_values
-        )[:no_values]
-    else:
-        idx_most_uncertain = np.argpartition([max(o) for o in preds_probs], no_values)[
-            :no_values
-        ]
+    mean_values_list = []
+    values_list = []
+    for threshold in thresholds:
+        no_values = int(len(preds_probs) * threshold)
+        if multilabel:
+            idx_most_uncertain = np.argpartition(
+                [np.mean(o) for o in abs(preds_probs - 0.5)], no_values
+            )[:no_values]
+        else:
+            idx_most_uncertain = np.argpartition(
+                [max(o) for o in preds_probs], no_values
+            )[:no_values]
 
-    if method == "oracle":
-        preds_labels[idx_most_uncertain] = target_labels[idx_most_uncertain]
-        preds_probs[idx_most_uncertain] = target_labels[idx_most_uncertain]
-    elif method == "rejection":
-        preds_labels = [
-            preds_labels[i]
-            for i in range(len(preds_labels))
-            if i not in idx_most_uncertain
-        ]
-        preds_probs = [
-            preds_probs[i]
-            for i in range(len(preds_probs))
-            if i not in idx_most_uncertain
-        ]
-        target_labels = [
-            target_labels[i]
-            for i in range(len(target_labels))
-            if i not in idx_most_uncertain
-        ]
-    else:
-        raise ValueError("Unknown method: {}".format(method))
+        if method == "oracle":
+            preds_labels[idx_most_uncertain] = target_labels[idx_most_uncertain]
+            preds_probs[idx_most_uncertain] = target_labels[idx_most_uncertain]
+        elif method == "rejection":
+            preds_labels = np.array(
+                [
+                    preds_labels[i]
+                    for i in range(len(preds_labels))
+                    if i not in idx_most_uncertain
+                ]
+            )
+            preds_probs = np.array(
+                [
+                    preds_probs[i]
+                    for i in range(len(preds_probs))
+                    if i not in idx_most_uncertain
+                ]
+            )
+            target_labels = np.array(
+                [
+                    target_labels[i]
+                    for i in range(len(target_labels))
+                    if i not in idx_most_uncertain
+                ]
+            )
+        else:
+            raise ValueError("Unknown method: {}".format(method))
 
-    if metric == "acc":
-        value = accuracy_score(target_labels, preds_labels)
-    elif metric == "err":
-        value = f1_score(target_labels, preds_labels, average="macro")
-    elif metric == "auc":
-        value = roc_auc_score(
-            target_labels, preds_probs, average="macro", multi_class="ovr"
-        )
-    else:
-        raise ValueError("Unknown metric: {}".format(metric))
+        if metric == "acc":
+            values = None
+            mean_value = accuracy_score(target_labels, preds_labels)
+        elif metric == "err":
+            values = None
+            mean_value = f1_score(target_labels, preds_labels, average="micro")
+        elif metric == "auc":
+            values = [round(a,4) for a in metric_AUROC(target_labels, preds_probs)]
+            mean_value = np.array([i for i in metric_AUROC(target_labels, preds_probs) if i > 0]).mean()
+        else:
+            raise ValueError("Unknown metric: {}".format(metric))
 
-    return value
+        mean_values_list.append(round(mean_value, 4))
+        values_list.append(values)
+
+    return mean_values_list, values_list
 
 
 def regression_metrics(
@@ -351,14 +377,12 @@ def regression_metrics(
             metric_values[value] = f1_score(
                 target_labels[independent_reg_variable == value],
                 preds_labels[independent_reg_variable == value],
-                average="macro",
+                average="micro",
             )
         elif metric == "auc":
-            metric_values[value] = roc_auc_score(
+            metric_values[value] = metric_AUROC(
                 target_labels[independent_reg_variable == value],
                 preds_labels[independent_reg_variable == value],
-                average="macro",
-                multi_class="ovr",
             )
         else:
             raise ValueError("Unknown metric: {}".format(metric))
@@ -403,7 +427,7 @@ def expected_calibration_error(
         # Create bins
         bins = {
             start_value: {"prob": [], "acc": []}
-            for start_value in np.linspace(0, 1, num_bins + 1)[:-1]
+            for start_value in np.linspace(0, 0.5, num_bins + 1)[:-1]
         }
 
         # Loop through each prediction and add to the correct bin the probability and accuracy
@@ -411,8 +435,11 @@ def expected_calibration_error(
             preds_probs[:, i], preds_labels[:, i], target_labels[:, i]
         ):
             for start_value in bins.keys():
-                if prob >= start_value and prob < start_value + 1 / num_bins:
-                    bins[start_value]["prob"].append(prob)
+                if (
+                    abs(prob - 0.5) >= start_value
+                    and abs(prob - 0.5) < start_value + 1 / num_bins
+                ):
+                    bins[start_value]["prob"].append(abs(prob - 0.5))
                     bins[start_value]["acc"].append(int(pred == target))
                     break
 

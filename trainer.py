@@ -92,15 +92,38 @@ def test_classification(checkpoint, data_loader_test, device, args):
     model = build_classification_model(args)
   else:
     model = ClassificationNet(args.model_name.lower(), args.num_class, args, activation=args.activate)
-
+    
+  #print(f'model to load weights in: {model}')
+  
   modelCheckpoint = torch.load(checkpoint, map_location=device)
-  state_dict = modelCheckpoint['state_dict']
+  if "state_dict" in modelCheckpoint:
+      state_dict = modelCheckpoint["state_dict"]
+  elif "model" in modelCheckpoint:
+      state_dict = modelCheckpoint["model"]
+  else:
+      raise ValueError(f"No state_dict or model in modelCheckpoint: {modelCheckpoint.keys()}")
+  
   for k in list(state_dict.keys()):
     if k.startswith('module.'):
       state_dict[k[len("module."):]] = state_dict[k]
       del state_dict[k]
+    if k.startswith('vit.'):
+      state_dict[k[len("vit."):]] = state_dict[k]
+      del state_dict[k]
+  for k in list(state_dict.keys()):
+    if k.startswith('head_class.'):
+      state_dict[f'head.{k[len("head_class."):]}'] = state_dict[k]
+      del state_dict[k]
 
-  msg = model.load_state_dict(state_dict)
+  if state_dict['patch_embed.proj.weight'].shape[1] < model.state_dict()['patch_embed.proj.weight'].shape[1]:
+      print(f"Number of channels in pretrained model {state_dict['patch_embed.proj.weight'].shape} is not same as the model {model.state_dict()['patch_embed.proj.weight'].shape}. Converting the pretrained model")
+      state_dict['patch_embed.proj.weight'] = state_dict['patch_embed.proj.weight'].repeat(1, model.state_dict()['patch_embed.proj.weight'].shape[1], 1, 1)
+      print(f"New shape of pretrained model {state_dict['patch_embed.proj.weight'].shape}")
+
+  print(f'state_dict to load: {state_dict.keys()}')
+
+  msg = model.load_state_dict(state_dict, strict=False)
+  print('Loaded with msg: {}'.format(msg))
   assert len(msg.missing_keys) == 0
   print("=> loaded pre-trained model '{}'".format(checkpoint))
 
