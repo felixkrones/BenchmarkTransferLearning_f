@@ -100,7 +100,7 @@ def build_transform_segmentation():
 
 
 class PadchestDataset(Dataset):
-  def __init__(self, images_path, file_path, augment, diseases_to_test):
+  def __init__(self, images_path, file_path, augment, diseases_to_test, nc=1):
     self.img_path_col = "ImageID"
     self.label_col = "Labels"
     self.filter_dir = {
@@ -110,13 +110,11 @@ class PadchestDataset(Dataset):
     }
     self.transform = augment
     self.annotation_file = pd.read_csv(file_path)
+    self.nc = nc
 
     # Filder the data based on self.filter_dir
     for key, value in self.filter_dir.items():
       self.annotation_file = self.annotation_file[self.annotation_file[key].isin(value)]
-    
-    # Get image paths
-    self.img_list = [os.path.join(images_path, x) for x in self.annotation_file[self.img_path_col].values]
 
     # Get possible labels
     self.possible_labels = np.unique([list for sublist in self.annotation_file['Labels'].fillna('[]').apply(lambda x: eval(x)).values.tolist() for list in sublist] + [d.lower() for d in diseases_to_test])
@@ -125,6 +123,7 @@ class PadchestDataset(Dataset):
     df_aux = pd.concat([self.annotation_file[self.label_col].apply(lambda x: 1 if p in eval(x) else 0).rename(p) for p in self.possible_labels], axis=1)
     self.annotation_file = pd.concat((self.annotation_file, df_aux), axis=1)
     self.img_label = self.annotation_file[self.possible_labels].values
+    self.img_list = [os.path.join(images_path, x) for x in self.annotation_file[self.img_path_col].values]
 
     self.annotation_file.to_csv(file_path.replace(".csv", "_filtered.csv"), index=False)
     self.possible_labels = self.possible_labels.tolist()
@@ -135,14 +134,19 @@ class PadchestDataset(Dataset):
     return self._length 
    
   def __getitem__(self, index):
-
     imagePath = self.img_list[index]
-
-    imageData = Image.open(imagePath).convert('RGB')
-    imageLabel = torch.FloatTensor(self.img_label[index])
-
-    if self.transform != None: imageData = self.transform(imageData)
-
+    imageLabel = torch.from_numpy(self.img_label[index])
+    imageData = Image.open(imagePath)
+    if self.nc == 3:
+      if imageData.mode != 'RGB':
+        imageData = imageData.convert('RGB')
+    elif self.nc == 1:
+      if imageData.mode != 'L':
+        imageData = imageData.convert('L')
+    else:
+      raise Exception("Invalid number of channels")
+    if self.transform != None: 
+       imageData = self.transform(imageData)
     return imageData, imageLabel
   
 
@@ -313,12 +317,12 @@ class ChestXray14Dataset_general(Dataset):
 
 class ChestXray14Dataset(Dataset):
 
-  def __init__(self, images_path, file_path, augment, num_class=14, annotaion_percent=100, args=None):
+  def __init__(self, images_path, file_path, augment, num_class=14, annotaion_percent=100, nc=1):
 
     self.img_list = []
     self.img_label = []
     self.augment = augment
-    self.nc = args.nc
+    self.nc = nc
 
     with open(file_path, "r") as fileDescriptor:
       line = True
@@ -679,10 +683,11 @@ class PNEDataset(Dataset):
 
 
 class VinDrCXR(Dataset):
-    def __init__(self, images_path, file_path, augment):
+    def __init__(self, images_path, file_path, augment, nc=1):
         self.img_list = []
         self.img_label = []
         self.augment = augment
+        self.nc = nc
         annotation_file = pd.read_csv(os.path.join(images_path, "physionet.org/files/vindr-cxr/1.0.0/annotations/image_labels_test.csv"))
 
         self.possible_labels = annotation_file.columns[1:].tolist()
@@ -701,7 +706,15 @@ class VinDrCXR(Dataset):
     def __getitem__(self, index):
         imagePath = self.img_list[index]
         imageLabel = torch.from_numpy(self.img_label[index])
-        imageData = Image.open(imagePath).convert('RGB')
+        imageData = Image.open(imagePath)
+        if self.nc == 3:
+          if imageData.mode != 'RGB':
+            imageData = imageData.convert('RGB')
+        elif self.nc == 1:
+          if imageData.mode != 'L':
+            imageData = imageData.convert('L')
+        else:
+          raise Exception("Invalid number of channels")
         if self.augment != None: 
            imageData = self.augment(imageData)
         return imageData, imageLabel

@@ -24,7 +24,7 @@ def get_args_parser(main_args:bool=True):
     parser.add_option("--model", dest="model_name", help="DenseNet121", default="Resnet50", type="string")
     parser.add_option("--init", dest="init",
                       help="Random| ImageNet| ImageNet_1k| ImageNet_21k| SAM| DeiT| BEiT| DINO| MoCo_V3| GMML| MoBY | MAE| SimMIM",
-                      default="Random", type="string")
+                      default='', type="string")
     parser.add_option("--num_class", dest="num_class", help="number of the classes in the downstream task",
                       default=14, type="int")
     parser.add_option("--data_set", dest="data_set", help="ChestXray14|CheXpert|padchest", default="ChestXray14", type="string")
@@ -110,7 +110,7 @@ def get_args_parser(main_args:bool=True):
     parser.add_option("--activate", dest="activate", help="Sigmoid", default="Sigmoid", type="string")
     parser.add_option("--uncertain_label", dest="uncertain_label",
                       help="the label assigned to uncertain data (Ones | Zeros | LSR-Ones | LSR-Zeros)",
-                      default="LSR-Ones", type="string")
+                      default="Zeros", type="string")
     parser.add_option("--unknown_label", dest="unknown_label", help="the label assigned to unknown data",
                       default=0, type="int")
 
