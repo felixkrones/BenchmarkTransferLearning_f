@@ -115,10 +115,11 @@ def test_classification(checkpoint, data_loader_test, device, args):
       state_dict[f'head.{k[len("head_class."):]}'] = state_dict[k]
       del state_dict[k]
 
-  if state_dict['patch_embed.proj.weight'].shape[1] < model.state_dict()['patch_embed.proj.weight'].shape[1]:
-      print(f"Number of channels in pretrained model {state_dict['patch_embed.proj.weight'].shape} is not same as the model {model.state_dict()['patch_embed.proj.weight'].shape}. Converting the pretrained model")
-      state_dict['patch_embed.proj.weight'] = state_dict['patch_embed.proj.weight'].repeat(1, model.state_dict()['patch_embed.proj.weight'].shape[1], 1, 1)
-      print(f"New shape of pretrained model {state_dict['patch_embed.proj.weight'].shape}")
+  if "vit" in args.model_name.lower():
+    if state_dict['patch_embed.proj.weight'].shape[1] < model.state_dict()['patch_embed.proj.weight'].shape[1]:
+        print(f"Number of channels in pretrained model {state_dict['patch_embed.proj.weight'].shape} is not same as the model {model.state_dict()['patch_embed.proj.weight'].shape}. Converting the pretrained model")
+        state_dict['patch_embed.proj.weight'] = state_dict['patch_embed.proj.weight'].repeat(1, model.state_dict()['patch_embed.proj.weight'].shape[1], 1, 1)
+        print(f"New shape of pretrained model {state_dict['patch_embed.proj.weight'].shape}")
 
   print(f'state_dict to load: {state_dict.keys()}')
 
