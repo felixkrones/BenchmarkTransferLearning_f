@@ -83,8 +83,8 @@ def get_args_parser(main_args:bool=True):
                         help='epochs to warmup LR, if scheduler supports')
     parser.add_option('--cooldown-epochs', type=int, default=10, metavar='N',
                         help='epochs to cooldown LR at min_lr, after cyclic schedule ends')
-    # parser.add_option('--patience-epochs', type=int, default=10, metavar='N',
-    #                     help='patience epochs for Plateau LR scheduler (default: 10')
+    parser.add_option('--patience-epochs', type=int, default=10, metavar='N',
+                         help='patience epochs for Plateau LR scheduler (default: 10')
     parser.add_option('--decay-rate', '--dr', type=float, default=0.5, metavar='RATE',
                         help='LR decay rate (default: 0.1)')
 

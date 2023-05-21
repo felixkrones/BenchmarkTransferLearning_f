@@ -1,0 +1,38 @@
+Disease = ['Atelectasis', 'Cardiomegaly', 'Effusion', 'Infiltration', 'Mass', 'Nodule', 'Pneumonia', 'Pneumothorax', 'Consolidation', 'Edema', 'Emphysema', 'Fibrosis', 'Pleural_Thickening', 'Hernia']
+ResNet50_random_run_0: AUC test = [0.687 	0.7113	0.7477	0.6578	0.6143	0.6016	0.619 	0.738 	0.6961	0.7955
+ 0.6767	0.7064	0.6679	0.8212]
+ResNet50_random_run_0: AUC all = [0.687 	0.7113	0.7477	0.6578	0.6143	0.6016	0.619 	0.738 	0.6961	0.7955
+ 0.6767	0.7064	0.6679	0.8212]
+ResNet50_random_run_0: AUC test = 0.6958
+ResNet50_random_run_0: AUC all = 0.6958
+All trials: test mAUC  = [0.6958]
+Mean AUC over All test trials = 0.6958
+STD over All test trials:  = 0.0000
+All trials: all mAUC  = [0.6958]
+Mean AUC over All all trials = 0.6958
+STD over All all trials:  = 0.0000
+Disease = ['Atelectasis', 'Cardiomegaly', 'Effusion', 'Infiltration', 'Mass', 'Nodule', 'Pneumonia', 'Pneumothorax', 'Consolidation', 'Edema', 'Emphysema', 'Fibrosis', 'Pleural_Thickening', 'Hernia']
+ResNet50_random_run_0: AUC test = [0.732 	0.8583	0.7988	0.6868	0.7653	0.6932	0.6944	0.8023	0.7223	0.8315
+ 0.7663	0.7648	0.7242	0.8401]
+ResNet50_random_run_0: AUC all = [0.732 	0.8583	0.7988	0.6868	0.7653	0.6932	0.6944	0.8023	0.7223	0.8315
+ 0.7663	0.7648	0.7242	0.8401]
+ResNet50_random_run_0: AUC test = 0.7629
+ResNet50_random_run_0: AUC all = 0.7629
+ResNet50_random_run_1: AUC test = [0.7125	0.8431	0.7922	0.6862	0.7724	0.6965	0.6799	0.7991	0.7249	0.8275
+ 0.7729	0.7546	0.718 	0.7737]
+ResNet50_random_run_1: AUC all = [0.7125	0.8431	0.7922	0.6862	0.7724	0.6965	0.6799	0.7991	0.7249	0.8275
+ 0.7729	0.7546	0.718 	0.7737]
+ResNet50_random_run_1: AUC test = 0.7538
+ResNet50_random_run_1: AUC all = 0.7538
+ResNet50_random_run_2: AUC test = [0.7402	0.8468	0.8047	0.678 	0.7583	0.6855	0.6779	0.773 	0.7031	0.8207
+ 0.747 	0.752 	0.7182	0.8456]
+ResNet50_random_run_2: AUC all = [0.7402	0.8468	0.8047	0.678 	0.7583	0.6855	0.6779	0.773 	0.7031	0.8207
+ 0.747 	0.752 	0.7182	0.8456]
+ResNet50_random_run_2: AUC test = 0.7536
+ResNet50_random_run_2: AUC all = 0.7536
+All trials: test mAUC  = [0.7629	0.7538	0.7536]
+Mean AUC over All test trials = 0.7568
+STD over All test trials:  = 0.0043
+All trials: all mAUC  = [0.7629	0.7538	0.7536]
+Mean AUC over All all trials = 0.7568
+STD over All all trials:  = 0.0043

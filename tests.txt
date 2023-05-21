@@ -1,37 +1,7 @@
 ################################################################################
-# Covert moco
-################################################################################
-python convert_to_deit.py \
-  --input /home/ubuntu/models/moco/imagenet/vit_small/vit-s_300ep.pth.tar \
-  --output /home/ubuntu/models/moco/imagenet/vit_small/moco-v3_vits_300e_imagenet_deit.pth
-
-
-################################################################################
-# simmim benchmark
-################################################################################
-# ChestXray14: 78.87
-python main_classification.py --data_set ChestXray14  \
---data_dir /home/ubuntu/data/NIH/images \
---model swin_base \
---mode train \
---resume True \
---init simmim \
---proxy_dir /home/ubuntu/models/simmim_swinb_Scratch_ChestXray14.pth \
---train_list dataset/Xray14_train_official.txt \
---val_list dataset/Xray14_val_official.txt \
---test_list dataset/Xray14_test_official.txt \
---device cuda \
---epochs 20 \
---batch_size 48 \
---trial 5 \
---lr 0.1 --opt sgd
-
-
-
-################################################################################
 # Fine-tuning benchmark
 ################################################################################
-7	    ViT_small	GMML	    Self-supervised 		NIH (1000e)
+0.2.1    ViT_small	GMML	    Self-supervised 		NIH (1000e)
 python main_classification.py --data_set ChestXray14 \
 --data_dir /home/ubuntu/data/NIH/images \
 --model vit_small \
@@ -44,8 +14,11 @@ python main_classification.py --data_set ChestXray14 \
 --test_list dataset/Xray14_test_official.txt \
 --device cuda \
 --epochs 30 \
---batch_size 64
+--batch_size 64 \
+--trial 6
 
+
+0.2.2
 python main_classification.py --data_set ChestXray14 \
 --data_dir /home/ubuntu/data/NIH/images \
 --model vit_small \
@@ -62,30 +35,17 @@ python main_classification.py --data_set ChestXray14 \
 --trial 6
 
 
-8	    ViT_small	SiT	    Self-supervised 		NIH (200e)
-python main_classification.py --data_set ChestXray14 \
---data_dir /home/ubuntu/data/NIHChest14/images/ \
---model vit_small \
---mode train \
---resume True \
---init sit \
---proxy_dir /home/ubuntu/models/SiT/nih/sit_vit_small_100e_nih.pth \
---train_list dataset/Xray14_train_official.txt \
---val_list dataset/Xray14_val_official.txt \
---test_list dataset/Xray14_test_official.txt \
---device cuda \
---epochs 20 \
---batch_size 64
+
 
 
 
 
 ################################################################################
-# Fine-tuning experiments random
+# Fine-tuning experiments supervised
 ################################################################################
-0.1	ResNet50	supervised	Random
+1.1	ResNet50	supervised	Random
 python main_classification.py --data_set ChestXray14 \
---data_dir /Users/felixkrones/python_projects/data/NIHChest14/images/ \
+--data_dir /home/ubuntu/data/NIH/images/ \
 --model ResNet50 \
 --mode train \
 --resume True \
@@ -93,13 +53,32 @@ python main_classification.py --data_set ChestXray14 \
 --train_list dataset/Xray14_train_official.txt \
 --val_list dataset/Xray14_val_official.txt \
 --test_list dataset/Xray14_test_official.txt \
---device mps \
+--device cuda \
 --epochs 20 \
---batch_size 64
+--batch_size 64 \
+--trial 3 \
+--lr 2e-4
 
-0.2	vit_small	supervised	Random
+1.2
 python main_classification.py --data_set ChestXray14 \
---data_dir /home/ubuntu/data/NIHChest14/images/ \
+--data_dir /home/ubuntu/data/NIH/images \
+--model ResNet50 \
+--mode train \
+--resume True \
+--init imagenet \
+--train_list dataset/Xray14_train_official.txt \
+--val_list dataset/Xray14_val_official.txt \
+--test_list dataset/Xray14_test_official.txt \
+--device cuda \
+--epochs 20 \
+--batch_size 64 \
+--trial 3 \
+--lr 2e-4
+
+
+2.1	vit_small	supervised	Random
+python main_classification.py --data_set ChestXray14 \
+--data_dir /home/ubuntu/data/NIH/images/ \
 --model vit_small \
 --mode train \
 --resume True \
@@ -108,8 +87,27 @@ python main_classification.py --data_set ChestXray14 \
 --val_list dataset/Xray14_val_official.txt \
 --test_list dataset/Xray14_test_official.txt \
 --device cuda \
+--batch_size 64 \
 --epochs 20 \
---batch_size 64
+--lr 1e-5 \
+--trial 4
+
+
+2.2	vit_small	supervised	Imagenet
+python main_classification.py --data_set ChestXray14 \
+--data_dir /home/ubuntu/data/NIH/images/ \
+--model vit_small \
+--mode train \
+--resume True \
+--init imagenet \
+--train_list dataset/Xray14_train_official.txt \
+--val_list dataset/Xray14_val_official.txt \
+--test_list dataset/Xray14_test_official.txt \
+--device cuda \
+--batch_size 64 \
+--epochs 20 \
+--lr 1e-5 \
+--trial 4
 
 
 
@@ -223,3 +221,33 @@ python main_classification.py --data_set ChestXray14 \
 --device mps \
 --epochs 20 \
 --batch_size 64
+
+
+
+################################################################################
+# Covert moco
+################################################################################
+python convert_to_deit.py \
+  --input /home/ubuntu/models/moco/imagenet/vit_small/vit-s_300ep.pth.tar \
+  --output /home/ubuntu/models/moco/imagenet/vit_small/moco-v3_vits_300e_imagenet_deit.pth
+
+
+################################################################################
+# simmim benchmark
+################################################################################
+# ChestXray14: 78.87
+python main_classification.py --data_set ChestXray14  \
+--data_dir /home/ubuntu/data/NIH/images \
+--model swin_base \
+--mode train \
+--resume True \
+--init simmim \
+--proxy_dir /home/ubuntu/models/simmim_swinb_Scratch_ChestXray14.pth \
+--train_list dataset/Xray14_train_official.txt \
+--val_list dataset/Xray14_val_official.txt \
+--test_list dataset/Xray14_test_official.txt \
+--device cuda \
+--epochs 20 \
+--batch_size 48 \
+--trial 5 \
+--lr 0.1 --opt sgd
