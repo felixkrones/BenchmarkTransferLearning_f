@@ -162,7 +162,7 @@ def test_classification(checkpoint, data_loader_test, device, args):
         out = model(varInput)
         outMean = out.view(bs, n_crops, -1).mean(1)
         p_test = torch.cat((p_test, outMean.data), 0)
-
+        
   return y_test, p_test
 
 def test_segmentation(model, model_save_path,data_loader_test, device,log_writter):
