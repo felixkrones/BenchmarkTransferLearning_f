@@ -1,4 +1,27 @@
 ################################################################################
+# Fine-tuning benchmark to literature
+################################################################################
+0.1.1    ViT_base 	SimMIM	    Self-supervised 		ImageNet1k
+python main_classification.py --data_set ChestXray14 \
+--data_dir /Users/felixkrones/python_projects/data/NIH/images \
+--model vit_base \
+--mode train \
+--resume True \
+--init simmim \
+--proxy_dir /Users/felixkrones/python_projects/models/GMML/Pretrain/simmim_pretrain__vit_base__img224__800ep.pth \
+--train_list dataset/Xray14_train_official.txt \
+--val_list dataset/Xray14_val_official.txt \
+--test_list dataset/Xray14_test_official.txt \
+--device mps \
+--epochs 1 \
+--batch_size 64 \
+--trial 1 \
+--nc 3
+
+
+
+
+################################################################################
 # Fine-tuning benchmark
 ################################################################################
 0.2.1    ViT_small	GMML	    Self-supervised 		NIH (1000e)
