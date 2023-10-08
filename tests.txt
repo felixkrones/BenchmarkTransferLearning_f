@@ -1,7 +1,7 @@
 ################################################################################
 # Fine-tuning benchmark to literature
 ################################################################################
-0.1.1    ViT_base 	SimMIM	    Self-supervised 		ImageNet1k
+0.1.1    ViT_base 	SimMIM 		ImageNet1k     None      NIH
 python main_classification.py --data_set ChestXray14 \
 --data_dir /Users/felixkrones/python_projects/data/NIH/images \
 --model vit_base \

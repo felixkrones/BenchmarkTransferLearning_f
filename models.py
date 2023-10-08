@@ -96,6 +96,7 @@ def build_classification_model(args):
             print("Creating model from proxy_dir weights: "+ args.proxy_dir)
             if args.model_name.lower() == "vit_base":
                 if args.init.lower() == "simmim":
+                    print("Using simmim model for vit_base")
                     model = simmim.create_model(args)
                 else:
                     model = VisionTransformer(num_classes=args.num_class,
@@ -116,6 +117,7 @@ def build_classification_model(args):
                 
             elif args.model_name.lower() == "swin_base":
                 if args.init.lower() == "simmim":
+                    print("Using simmim model for swin_base")
                     model = simmim.create_model(args)
                 elif args.init.lower() =="imagenet_1k" or args.init.lower() =="imagenet":
                     model = timm.create_model('swin_base_patch4_window7_224', num_classes=args.num_class, checkpoint_path=args.proxy_dir)
@@ -123,6 +125,8 @@ def build_classification_model(args):
             elif args.model_name.lower() == "swin_tiny": 
                 model = timm.create_model('swin_tiny_patch4_window7_224', num_classes=args.num_class)
                 load_proxy_dir(model, args.init.lower(), args.proxy_dir)
+            else:
+                raise ValueError(f"Model {args.model_name} not supported")
         else:
             raise FileNotFoundError(f"Proxy dir {args.proxy_dir} is not a file or directory!")
         if model is None:
@@ -304,7 +308,3 @@ def load_proxy_dir(model, init, proxy_dir):
 def save_checkpoint(state,filename='model'):
 
     torch.save( state,filename + '.pth.tar')
-
-
-
-

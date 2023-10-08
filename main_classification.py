@@ -21,7 +21,7 @@ def get_args_parser(main_args:bool=True):
 
     parser.add_option("--GPU", dest="GPU", help="the index of gpu is used", default=None, action="callback",
                       callback=vararg_callback_int)
-    parser.add_option("--model", dest="model_name", help="DenseNet121", default="Resnet50", type="string")
+    parser.add_option("--model", dest="model_name", help="DenseNet121| vit_base| swin_base", default="Resnet50", type="string")
     parser.add_option("--init", dest="init",
                       help="Random| ImageNet| ImageNet_1k| ImageNet_21k| SAM| DeiT| BEiT| DINO| MoCo_V3| GMML| MoBY | MAE| SimMIM",
                       default='', type="string")
@@ -142,9 +142,9 @@ def main(args):
         diseases = ['Atelectasis', 'Cardiomegaly', 'Effusion', 'Infiltration', 'Mass', 'Nodule',
                     'Pneumonia', 'Pneumothorax', 'Consolidation', 'Edema',
                     'Emphysema', 'Fibrosis', 'Pleural_Thickening', 'Hernia']
-        dataset_train = ChestXray14Dataset(images_path=args.data_dir, file_path=args.train_list,augment=build_transform_classification(normalize=args.normalization, mode="train"), nc=args.nc)
-        dataset_val = ChestXray14Dataset(images_path=args.data_dir, file_path=args.val_list,augment=build_transform_classification(normalize=args.normalization, mode="valid"), nc=args.nc)
-        dataset_test = ChestXray14Dataset(images_path=args.data_dir, file_path=args.test_list,augment=build_transform_classification(normalize=args.normalization, mode="test", test_augment=args.test_augment), nc=args.nc)
+        dataset_train = ChestXray14Dataset(images_path=args.data_dir, file_path=args.train_list,augment=build_transform_classification(normalize=args.normalization, mode="train", nc=args.nc), nc=args.nc)
+        dataset_val = ChestXray14Dataset(images_path=args.data_dir, file_path=args.val_list,augment=build_transform_classification(normalize=args.normalization, mode="valid", nc=args.nc), nc=args.nc)
+        dataset_test = ChestXray14Dataset(images_path=args.data_dir, file_path=args.test_list,augment=build_transform_classification(normalize=args.normalization, mode="test", test_augment=args.test_augment, nc=args.nc), nc=args.nc)
 
         classification_engine(args, model_path, output_path, diseases, dataset_train, dataset_val, dataset_test)
 

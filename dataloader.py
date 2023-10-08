@@ -357,7 +357,6 @@ class ChestXray14Dataset(Dataset):
   def __getitem__(self, index):
 
     imagePath = self.img_list[index]
-
     if self.nc == 3:
       imageData = Image.open(imagePath).convert('RGB')
     elif self.nc == 1:
@@ -365,7 +364,6 @@ class ChestXray14Dataset(Dataset):
     else:
        raise ValueError(f"args.nc must be 1 or 3, not {self.nc}")
     imageLabel = torch.FloatTensor(self.img_label[index])
-
     if self.augment != None: imageData = self.augment(imageData)
 
     return imageData, imageLabel
