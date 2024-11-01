@@ -1,9 +1,9 @@
 # Extended: A Systematic Benchmarking Analysis of Transfer Learning for Medical Image Analysis
 
 ## Extended work
-This is our extension of the (Benchmark repository)[https://github.com/MR-HosseinzadehTaher/BenchmarkTransferLearning] by Hosseinzadeh et al., as we used it in our [Paper]().
+This is our extension of the [Benchmark repository](https://github.com/MR-HosseinzadehTaher/BenchmarkTransferLearning) by Hosseinzadeh et al., as we used it in our [Paper]().
 Please cite both if you find it helpful. We thank the original authors!
-It mainly extends the original repository in the following five ways:
+It mainly extends the original repository in the following ways:
 - Extended dataset support
 - Extended model support and combined repository with (Transformer extension)[https://github.com/jlianglab/BenchmarkTransformers]
 - Extended parameterisation
